@@ -10,7 +10,7 @@ using MonoMenu.Engine.Animations;
 
 namespace MonoMenu.Engine.Events
 {
-    class AnimatedEvent : MenuEvent
+    public class AnimatedEvent : MenuEvent
     {
         private string from, to, duration;
         private bool started;

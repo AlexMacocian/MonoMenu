@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MonoMenu.Engine.Events
 {
-    class MenuEvent
+    public class MenuEvent
     {
         private string name;
         protected Type eventType;

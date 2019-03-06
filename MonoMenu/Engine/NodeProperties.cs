@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MonoMenu.Engine
 {
-    class NodeProperties
+    public class NodeProperties
     {
         public enum HorizontalAlignment
         {

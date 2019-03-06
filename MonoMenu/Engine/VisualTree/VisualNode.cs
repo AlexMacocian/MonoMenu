@@ -12,7 +12,7 @@ using static MonoMenu.Engine.NodeProperties;
 
 namespace MonoMenu.Engine.VisualTree
 {
-    class VisualNode
+    public class VisualNode
     {
         private RenderTarget2D renderTarget;
         private GraphicsDevice graphicsDevice;

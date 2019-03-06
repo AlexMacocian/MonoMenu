@@ -8,7 +8,7 @@ using static MonoMenu.Engine.Events.MenuEvent;
 
 namespace MonoMenu.Engine.Animations
 {
-    class DoubleAnimation : BaseAnimation
+    public class DoubleAnimation : BaseAnimation
     {
         private double from, to, step, current;
         public DoubleAnimation(string name, string from, string to, TimeSpan duration, LogicalTree.LogicalNode node, Target targetProperty) : base(name, from, to, duration, node, targetProperty)

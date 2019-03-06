@@ -8,7 +8,7 @@ using static MonoMenu.Engine.Events.MenuEvent;
 
 namespace MonoMenu.Engine.Animations
 {
-    class BaseAnimation
+    public class BaseAnimation
     {
         public EventHandler Finished;
         protected string sfrom, sto;

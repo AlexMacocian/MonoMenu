@@ -14,7 +14,7 @@ using static MonoMenu.Engine.NodeProperties;
 
 namespace MonoMenu.Engine
 {
-    class MonoMenu
+    public class MonoMenu
     {
         private static Random random = new Random();
 

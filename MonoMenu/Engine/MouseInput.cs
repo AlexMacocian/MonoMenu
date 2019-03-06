@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MonoMenu.Engine
 {
-    class MouseInput
+    public class MouseInput
     {    
         public static EventHandler LeftMouseButtonClick, LeftMouseButtonDoubleClick, 
             RightMouseButtonClick, RightMouseButtonDoubleClick, MiddleMouseButtonClick, MiddleMouseButtonDoubleClick;

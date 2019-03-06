@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace MonoMenu.Engine.VisualPrimitives
 {
-    class Ellipse : VisualPrimitive
+    public class Ellipse : VisualPrimitive
     {
         public Ellipse(GraphicsDevice graphicsDevice) : base(graphicsDevice)
         {
