@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using MonoMenu.Engine;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -11,10 +12,15 @@ namespace MonoMenu
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Menu xMenu;
+        SpriteFont font;
+        Texture2D pixelText;
         
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            //graphics.PreferredBackBufferHeight = 800;
+            //graphics.PreferredBackBufferWidth = 800;
             Content.RootDirectory = "Content";
         }
 
@@ -27,8 +33,16 @@ namespace MonoMenu
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            xMenu = new Menu(GraphicsDevice);
             base.Initialize();
+            Monitor.Initialize();
+            this.Window.AllowUserResizing = true;
+            this.Window.ClientSizeChanged += Window_ClientSizeChanged;
+        }
+
+        private void Window_ClientSizeChanged(object sender, System.EventArgs e)
+        {
+            xMenu.Resize();
         }
 
         /// <summary>
@@ -39,7 +53,11 @@ namespace MonoMenu
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            Menu.defaultFont = Content.Load<SpriteFont>("font");
+            pixelText = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            pixelText.SetData(new[] { Color.White });
+            font = Content.Load<SpriteFont>("font");
+            xMenu.Load("text.xml");
             // TODO: use this.Content to load your game content here
         }
 
@@ -61,7 +79,9 @@ namespace MonoMenu
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
+            MouseInput.Poll(gameTime);
+            xMenu.Update(gameTime);
+            Monitor.UpdateCalled();
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -73,8 +93,14 @@ namespace MonoMenu
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            Monitor.DrawCalled();
+            GraphicsDevice.Clear(Color.Transparent);
+            xMenu.Draw(spriteBatch);
+            spriteBatch.Begin();
+            spriteBatch.Draw(pixelText, new Rectangle(MouseInput.MousePosition, new Point(3, 3)), Color.Red);
+            spriteBatch.DrawString(font, "UpdateRate: " + Monitor.UpdateRate, new Vector2(10, 10), Color.Red, 0, new Vector2(0, 0), 0.25f, SpriteEffects.None, 1);
+            spriteBatch.DrawString(font, "DrawRate: " + Monitor.FrameRate, new Vector2(10, 30), Color.Red, 0, new Vector2(0, 0), 0.25f, SpriteEffects.None, 1);
+            spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
