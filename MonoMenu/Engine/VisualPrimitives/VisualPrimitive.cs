@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MonoMenu.Engine.VisualPrimitives
 {
-    class VisualPrimitive
+    public class VisualPrimitive
     {
         protected Texture2D texture;
         protected GraphicsDevice graphicsDevice;

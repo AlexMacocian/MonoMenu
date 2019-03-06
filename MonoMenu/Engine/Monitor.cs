@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MonoMenu.Engine
 {
-    class Monitor
+    public class Monitor
     {
         private static double frames, millis, updates;
         private static Stopwatch stopWatch;

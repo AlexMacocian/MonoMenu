@@ -14,7 +14,7 @@ using static MonoMenu.Engine.NodeProperties;
 
 namespace MonoMenu.Engine
 {
-    class MonoMenu
+    public class MonoMenu
     {
         private static Random random = new Random();
 
@@ -64,8 +64,14 @@ namespace MonoMenu.Engine
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            Draw(spriteBatch, null);
+        }
+
+        public void Draw(SpriteBatch spriteBatch, RenderTarget2D renderTarget)
+        {
             root.VisualNode.RecursiveDraw(spriteBatch);
-            graphicsDevice.SetRenderTarget(null);
+            graphicsDevice.SetRenderTarget(renderTarget);
+            graphicsDevice.Clear(Color.Transparent);
             spriteBatch.Begin();
             spriteBatch.Draw(root.VisualNode.RenderTarget, new Rectangle(root.AbsolutePosition.X, root.AbsolutePosition.Y, (int)root.DesiredWidth, (int)root.DesiredHeight), Color.White);
             spriteBatch.End();
@@ -170,11 +176,11 @@ namespace MonoMenu.Engine
                 {
                     horizontalAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), innerNode.InnerText);
                 }
-                else if (innerNode.Name == "VerticalContentAlignment")
+                else if (innerNode.Name == "VerticalTextAlignment")
                 {
                     verticalTextAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), innerNode.InnerText);
                 }
-                else if (innerNode.Name == "HorizontalContentAlignment")
+                else if (innerNode.Name == "HorizontalTextAlignment")
                 {
                     horizontalTextAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), innerNode.InnerText);
                 }
@@ -382,7 +388,7 @@ namespace MonoMenu.Engine
             {
                 colorcode = colorcode.Remove(0, 1);
             }
-            if (colorcode.Length == 9)
+            if (colorcode.Length == 8)
             {
                 return Color.FromNonPremultiplied(int.Parse(colorcode.Substring(2, 2), NumberStyles.HexNumber),
                 int.Parse(colorcode.Substring(4, 2), NumberStyles.HexNumber),

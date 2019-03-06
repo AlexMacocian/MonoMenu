@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace MonoMenu.Engine.VisualPrimitives
 {
-    class Rectangle : VisualPrimitive
+    public class Rectangle : VisualPrimitive
     {
         public Rectangle(GraphicsDevice graphicsDevice) : base(graphicsDevice)
         {

@@ -54,6 +54,7 @@
     <Compile Include="Engine\MouseInput.cs" />
     <Compile Include="Engine\NodeProperties.cs" />
     <Compile Include="Engine\VisualPrimitives\Ellipse.cs" />
+    <Compile Include="Engine\VisualPrimitives\Polygon.cs" />
     <Compile Include="Engine\VisualPrimitives\Rectangle.cs" />
     <Compile Include="Engine\VisualPrimitives\VisualPrimitive.cs" />
     <Compile Include="Engine\VisualTree\VisualNode.cs" />

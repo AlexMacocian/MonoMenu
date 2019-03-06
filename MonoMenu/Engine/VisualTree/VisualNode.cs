@@ -12,7 +12,7 @@ using static MonoMenu.Engine.NodeProperties;
 
 namespace MonoMenu.Engine.VisualTree
 {
-    class VisualNode
+    public class VisualNode
     {
         private RenderTarget2D renderTarget;
         private GraphicsDevice graphicsDevice;
@@ -155,7 +155,7 @@ namespace MonoMenu.Engine.VisualTree
             set
             {
                 text = value;
-                modified = true;
+                Modified = true;
             }
         }
 
@@ -262,7 +262,7 @@ namespace MonoMenu.Engine.VisualTree
         {
             this.LogicalNode = lnode;
             this.graphicsDevice = device;
-            this.BackgroundColor = Color.White;
+            this.BackgroundColor = Color.Transparent;
             this.ForegroundColor = Color.Transparent;
             this.BorderColor = Color.Transparent;
             this.fontSize = 0;
@@ -353,7 +353,24 @@ namespace MonoMenu.Engine.VisualTree
                 float scale = (float)fontSize / MonoMenu.defaultFontSize;
                 Vector2 size = MonoMenu.defaultFont.MeasureString(text);
                 size = new Vector2(size.X * scale, size.Y * scale);
-                spriteBatch.DrawString(MonoMenu.defaultFont, text, new Vector2((int)(width/2 - size.X / 2), (int)(height / 2 - size.Y / 2)), foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
+                Vector2 pos = new Vector2();
+                if(horizontalTextAlignment == HorizontalAlignment.Right)
+                {
+                    pos.X = (float)width - size.X;
+                }
+                else if(horizontalTextAlignment == HorizontalAlignment.Center || horizontalTextAlignment == HorizontalAlignment.Stretch)
+                {
+                    pos.X = (float)width / 2 - size.X / 2;
+                }
+                if(verticalTextAlignment == VerticalAlignment.Bottom)
+                {
+                    pos.Y = (float)height - size.Y;
+                }
+                else if(verticalTextAlignment == VerticalAlignment.Center || verticalTextAlignment == VerticalAlignment.Stretch)
+                {
+                    pos.Y = (float)height / 2 - size.Y / 2;
+                }
+                spriteBatch.DrawString(MonoMenu.defaultFont, text, pos, foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
             }
             spriteBatch.End();
         }

@@ -9,7 +9,7 @@ using static MonoMenu.Engine.NodeProperties;
 
 namespace MonoMenu.Engine.Events
 {
-    class BasicEvent : MenuEvent
+    public class BasicEvent : MenuEvent
     {
         public BasicEvent(string name, Type type, string value, string triggerName, Target target) : base(name, type, value, triggerName, target)
         {

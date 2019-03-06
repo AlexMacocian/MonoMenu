@@ -8,7 +8,7 @@ using static MonoMenu.Engine.Events.MenuEvent;
 
 namespace MonoMenu.Engine.Animations
 {
-    class ColorAnimation : BaseAnimation
+    public class ColorAnimation : BaseAnimation
     {
         private Color from, to, step, current;
         private float stepA, stepR, stepG, stepB;

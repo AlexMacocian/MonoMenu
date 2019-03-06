@@ -8,9 +8,10 @@ using Microsoft.Xna.Framework;
 
 namespace MonoMenu.Engine.VisualPrimitives
 {
-    public class Ellipse : VisualPrimitive
+    class Polygon : VisualPrimitive
     {
-        public Ellipse(GraphicsDevice graphicsDevice) : base(graphicsDevice)
+        List<Point> points;
+        public Polygon(GraphicsDevice graphicsDevice, List<Point> points) : base(graphicsDevice)
         {
         }
 

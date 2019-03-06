@@ -14,7 +14,7 @@ using static MonoMenu.Engine.NodeProperties;
 
 namespace MonoMenu.Engine.LogicalTree
 {
-    class LogicalNode
+    public class LogicalNode
     {
         public EventHandler MouseOver, Click, DoubleClick, Dragging, MouseEnter, MouseLeave, LeftMouseDown, LeftMouseUp,
             RightMouseDown, RightMouseUp, OnResize;
