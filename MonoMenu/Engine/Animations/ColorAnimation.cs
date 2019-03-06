@@ -14,8 +14,8 @@ namespace MonoMenu.Engine.Animations
         private float stepA, stepR, stepG, stepB;
         public ColorAnimation(string name, string from, string to, TimeSpan duration, LogicalTree.LogicalNode node, Target targetProperty) : base(name, from, to, duration, node, targetProperty)
         {
-            this.from = Helper.HelperFunctions.ColorFromString(from);
-            this.to = Helper.HelperFunctions.ColorFromString(to);
+            this.from = MonoMenu.ColorFromString(from);
+            this.to = MonoMenu.ColorFromString(to);
         }
 
         public override void Enable()

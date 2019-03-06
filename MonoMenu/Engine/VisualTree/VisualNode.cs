@@ -350,10 +350,10 @@ namespace MonoMenu.Engine.VisualTree
             spriteBatch.Draw(type.Texture, new Microsoft.Xna.Framework.Rectangle(borderSize, borderSize, (int)width - borderSize * 2, (int)height - borderSize * 2), backgroundColor);
             if(!string.IsNullOrEmpty(text) && foregroundColor.A > 0)
             {
-                float scale = (float)fontSize / Menu.defaultFontSize;
-                Vector2 size = Menu.defaultFont.MeasureString(text);
+                float scale = (float)fontSize / MonoMenu.defaultFontSize;
+                Vector2 size = MonoMenu.defaultFont.MeasureString(text);
                 size = new Vector2(size.X * scale, size.Y * scale);
-                spriteBatch.DrawString(Menu.defaultFont, text, new Vector2((int)(width/2 - size.X / 2), (int)(height / 2 - size.Y / 2)), foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
+                spriteBatch.DrawString(MonoMenu.defaultFont, text, new Vector2((int)(width/2 - size.X / 2), (int)(height / 2 - size.Y / 2)), foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
             }
             spriteBatch.End();
         }

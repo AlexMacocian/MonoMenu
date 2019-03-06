@@ -12,7 +12,7 @@ namespace MonoMenu
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Menu xMenu;
+        Engine.MonoMenu xMenu;
         SpriteFont font;
         Texture2D pixelText;
         
@@ -33,7 +33,7 @@ namespace MonoMenu
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            xMenu = new Menu(GraphicsDevice);
+            xMenu = new Engine.MonoMenu(GraphicsDevice);
             base.Initialize();
             Monitor.Initialize();
             this.Window.AllowUserResizing = true;
@@ -53,7 +53,7 @@ namespace MonoMenu
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            Menu.defaultFont = Content.Load<SpriteFont>("font");
+            Engine.MonoMenu.defaultFont = Content.Load<SpriteFont>("font");
             pixelText = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixelText.SetData(new[] { Color.White });
             font = Content.Load<SpriteFont>("font");

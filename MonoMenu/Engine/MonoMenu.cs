@@ -14,14 +14,17 @@ using static MonoMenu.Engine.NodeProperties;
 
 namespace MonoMenu.Engine
 {
-    class Menu
+    class MonoMenu
     {
+        private static Random random = new Random();
+
+        public static Exception InvalidColor = new Exception("String could not be parsed into a valid color");
         public static SpriteFont defaultFont;
         public static int defaultFontSize = 48;
         private string filePath;
         private GraphicsDevice graphicsDevice;
         LogicalTree.LogicalNode root;
-        public Menu(GraphicsDevice device)
+        public MonoMenu(GraphicsDevice device)
         {
             this.graphicsDevice = device;
             MouseInput.LeftMouseButtonClick += LeftMouseButtonClick;
@@ -70,7 +73,7 @@ namespace MonoMenu.Engine
 
         private void ParseDoc(XmlDocument doc)
         {
-            root = new LogicalTree.LogicalNode(graphicsDevice, Helper.HelperFunctions.GenerateString(12), 0, 0, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
+            root = new LogicalTree.LogicalNode(graphicsDevice, MonoMenu.GenerateString(12), 0, 0, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
             foreach (XmlNode node in doc.ChildNodes)
             {
                 ParseNode(node, root);
@@ -153,11 +156,11 @@ namespace MonoMenu.Engine
                 }
                 else if (innerNode.Name == "Background")
                 {
-                    background = Helper.HelperFunctions.ColorFromString(innerNode.InnerText);
+                    background = MonoMenu.ColorFromString(innerNode.InnerText);
                 }
                 else if (innerNode.Name == "Foreground")
                 {
-                    foreground = Helper.HelperFunctions.ColorFromString(innerNode.InnerText);
+                    foreground = MonoMenu.ColorFromString(innerNode.InnerText);
                 }
                 else if (innerNode.Name == "VerticalAlignment")
                 {
@@ -189,7 +192,7 @@ namespace MonoMenu.Engine
                 }
                 else if (innerNode.Name == "BorderColor")
                 {
-                    borderColor = Helper.HelperFunctions.ColorFromString(innerNode.InnerText);
+                    borderColor = MonoMenu.ColorFromString(innerNode.InnerText);
                 }
                 else if (innerNode.Name == "Visibility")
                 {
@@ -231,7 +234,7 @@ namespace MonoMenu.Engine
                             }
                             if (string.IsNullOrEmpty(evName))
                             {
-                                evName = Helper.HelperFunctions.GenerateString(8);
+                                evName = MonoMenu.GenerateString(8);
                             }
                             events.Add(new BasicEvent(evName, evType, value, trigName,evTarget));
                         }
@@ -274,7 +277,7 @@ namespace MonoMenu.Engine
                             }
                             if (string.IsNullOrEmpty(evName))
                             {
-                                evName = Helper.HelperFunctions.GenerateString(8);
+                                evName = MonoMenu.GenerateString(8);
                             }
                             events.Add(new AnimatedEvent(evName, evType, evTarget, from, to, duration, trigName));
                         }
@@ -290,7 +293,7 @@ namespace MonoMenu.Engine
             }
             if(name == null)
             {
-                name = Helper.HelperFunctions.GenerateString(12);
+                name = MonoMenu.GenerateString(12);
             }
             LogicalTree.LogicalNode lnode = new LogicalTree.LogicalNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor, type as VisualPrimitives.VisualPrimitive, 
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
@@ -350,6 +353,61 @@ namespace MonoMenu.Engine
         public void Resize()
         {
             Resize(graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
+        }
+
+        public static Color ColorFromString(string colorcode)
+        {
+            if (colorcode[0] == '#')
+            {
+                return ColorFromHex(colorcode);
+            }
+            else
+            {
+                Type t = typeof(Color);
+                try
+                {
+                    Color c = (Color)t.GetProperty(colorcode, BindingFlags.Static | BindingFlags.Public).GetValue(null);
+                    return c;
+                }
+                catch
+                {
+                    throw InvalidColor;
+                }
+            }
+        }
+
+        public static Color ColorFromHex(string colorcode)
+        {
+            if (colorcode[0] == '#')
+            {
+                colorcode = colorcode.Remove(0, 1);
+            }
+            if (colorcode.Length == 9)
+            {
+                return Color.FromNonPremultiplied(int.Parse(colorcode.Substring(2, 2), NumberStyles.HexNumber),
+                int.Parse(colorcode.Substring(4, 2), NumberStyles.HexNumber),
+                int.Parse(colorcode.Substring(6, 2), NumberStyles.HexNumber),
+                int.Parse(colorcode.Substring(0, 2), NumberStyles.HexNumber));
+            }
+            else
+            {
+                return Color.FromNonPremultiplied(
+                int.Parse(colorcode.Substring(0, 2), NumberStyles.HexNumber),
+                int.Parse(colorcode.Substring(2, 2), NumberStyles.HexNumber),
+                int.Parse(colorcode.Substring(4, 2), NumberStyles.HexNumber), 255);
+            }
+        }
+
+        public static string GenerateString(int length)
+        {
+
+            string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            StringBuilder result = new StringBuilder(length);
+            for (int i = 0; i < length; i++)
+            {
+                result.Append(characters[random.Next(characters.Length)]);
+            }
+            return result.ToString();
         }
     }
 }

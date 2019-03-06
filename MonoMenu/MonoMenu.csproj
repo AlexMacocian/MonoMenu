@@ -49,7 +49,7 @@
     <Compile Include="Engine\Events\BasicEvent.cs" />
     <Compile Include="Engine\Events\MenuEvent.cs" />
     <Compile Include="Engine\LogicalTree\LogicalNode.cs" />
-    <Compile Include="Engine\Menu.cs" />
+    <Compile Include="Engine\MonoMenu.cs" />
     <Compile Include="Engine\Monitor.cs" />
     <Compile Include="Engine\MouseInput.cs" />
     <Compile Include="Engine\NodeProperties.cs" />
@@ -58,7 +58,6 @@
     <Compile Include="Engine\VisualPrimitives\VisualPrimitive.cs" />
     <Compile Include="Engine\VisualTree\VisualNode.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="Helper\HelperFunctions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

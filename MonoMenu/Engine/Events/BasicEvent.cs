@@ -21,13 +21,13 @@ namespace MonoMenu.Engine.Events
             switch(eventTarget)
             {
                 case Target.BorderColor:
-                    node.BorderColor = Helper.HelperFunctions.ColorFromString(value);
+                    node.BorderColor = MonoMenu.ColorFromString(value);
                     break;
                 case Target.Background:
-                    node.Background = Helper.HelperFunctions.ColorFromString(value);
+                    node.Background = MonoMenu.ColorFromString(value);
                     break;
                 case Target.Foreground:
-                    node.Foreground = Helper.HelperFunctions.ColorFromString(value);
+                    node.Foreground = MonoMenu.ColorFromString(value);
                     break;
                 case Target.Height:
                     if (value.Contains('%'))
