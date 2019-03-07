@@ -24,11 +24,24 @@ namespace MonoMenu.Engine
         private string filePath;
         private GraphicsDevice graphicsDevice;
         LogicalTree.LogicalNode root;
-        public Dictionary<string, LogicalTree.LogicalNode> Nodes;
+        private Dictionary<string, LogicalTree.LogicalNode> nodes;
+
+        public LogicalTree.LogicalNode this[string key]
+        {
+            get
+            {
+                return nodes[key];
+            }
+            set
+            {
+                nodes[key] = value;
+            }
+        }
+
         public MonoMenu(GraphicsDevice device)
         {
             this.graphicsDevice = device;
-            Nodes = new Dictionary<string, LogicalTree.LogicalNode>();
+            nodes = new Dictionary<string, LogicalTree.LogicalNode>();
             MouseInput.LeftMouseButtonClick += LeftMouseButtonClick;
             MouseInput.LeftMouseButtonDoubleClick += LeftMouseButtonDoubleClick;
         }
@@ -79,6 +92,37 @@ namespace MonoMenu.Engine
             spriteBatch.End();
         }
 
+        public LogicalTree.LogicalNode FindNode(string name)
+        {
+            Queue q = new Queue();
+            q.Enqueue(root);
+
+            while(q.Count > 0)
+            {
+                LogicalTree.LogicalNode node = (LogicalTree.LogicalNode)q.Dequeue();
+                if(node.Name == name)
+                {
+                    return node;
+                }
+                foreach(LogicalTree.LogicalNode child in node.Children)
+                {
+                    q.Enqueue(child);
+                }
+            }
+            return null;
+        }
+
+        public void Resize(double width, double height)
+        {
+            root.Resize(width, height);
+        }
+
+        public void Resize()
+        {
+            Resize(graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
+        }
+
+
         private void ParseDoc(XmlDocument doc)
         {
             root = new LogicalTree.LogicalNode(graphicsDevice, MonoMenu.GenerateString(12), 0, 0, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
@@ -95,7 +139,7 @@ namespace MonoMenu.Engine
             string primitive = node.Name;
             Assembly a = Assembly.GetExecutingAssembly();
             Type t = a.GetType("MonoMenu.Engine.VisualPrimitives." + primitive);
-            if(t == null)
+            if (t == null)
             {
                 return;
             }
@@ -175,7 +219,7 @@ namespace MonoMenu.Engine
                 {
                     verticalAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), innerNode.InnerText);
                 }
-                else if(innerNode.Name == "HorizontalAlignment")
+                else if (innerNode.Name == "HorizontalAlignment")
                 {
                     horizontalAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), innerNode.InnerText);
                 }
@@ -215,11 +259,11 @@ namespace MonoMenu.Engine
                 {
                     orientation = (LogicalTree.LogicalNode.NodeOrientation)Enum.Parse(typeof(LogicalTree.LogicalNode.NodeOrientation), innerNode.InnerText);
                 }
-                else if(innerNode.Name == "Events")
+                else if (innerNode.Name == "Events")
                 {
-                    foreach(XmlNode eventNode in innerNode.ChildNodes)
+                    foreach (XmlNode eventNode in innerNode.ChildNodes)
                     {
-                        if(eventNode.Name == "BasicEvent")
+                        if (eventNode.Name == "BasicEvent")
                         {
                             MenuEvent.Type evType = MenuEvent.Type.Click;
                             MenuEvent.Target evTarget = MenuEvent.Target.Background;
@@ -228,23 +272,23 @@ namespace MonoMenu.Engine
                             string trigName = string.Empty;
                             foreach (XmlNode innerEventNode in eventNode.ChildNodes)
                             {
-                                if(innerEventNode.Name == "Name")
+                                if (innerEventNode.Name == "Name")
                                 {
                                     evName = innerEventNode.InnerText;
                                 }
-                                if(innerEventNode.Name == "Type")
+                                if (innerEventNode.Name == "Type")
                                 {
                                     evType = (MenuEvent.Type)Enum.Parse(typeof(MenuEvent.Type), innerEventNode.InnerText);
                                 }
-                                else if(innerEventNode.Name == "Target")
+                                else if (innerEventNode.Name == "Target")
                                 {
                                     evTarget = (MenuEvent.Target)Enum.Parse(typeof(MenuEvent.Target), innerEventNode.InnerText);
                                 }
-                                else if(innerEventNode.Name == "Value")
+                                else if (innerEventNode.Name == "Value")
                                 {
                                     value = innerEventNode.InnerText;
                                 }
-                                else if(innerEventNode.Name == "Trigger")
+                                else if (innerEventNode.Name == "Trigger")
                                 {
                                     trigName = innerEventNode.InnerText;
                                 }
@@ -253,9 +297,9 @@ namespace MonoMenu.Engine
                             {
                                 evName = MonoMenu.GenerateString(8);
                             }
-                            events.Add(new BasicEvent(evName, evType, value, trigName,evTarget));
+                            events.Add(new BasicEvent(evName, evType, value, trigName, evTarget));
                         }
-                        else if(eventNode.Name == "AnimatedEvent")
+                        else if (eventNode.Name == "AnimatedEvent")
                         {
                             MenuEvent.Type evType = MenuEvent.Type.Click;
                             MenuEvent.Target evTarget = MenuEvent.Target.Background;
@@ -308,11 +352,11 @@ namespace MonoMenu.Engine
                     }
                 }
             }
-            if(name == null)
+            if (name == null)
             {
                 name = MonoMenu.GenerateString(12);
             }
-            LogicalTree.LogicalNode lnode = new LogicalTree.LogicalNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor, type as VisualPrimitives.VisualPrimitive, 
+            LogicalTree.LogicalNode lnode = new LogicalTree.LogicalNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor, type as VisualPrimitives.VisualPrimitive,
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
                 percentageX, percentageY, text);
             lnode.Events = events;
@@ -323,8 +367,8 @@ namespace MonoMenu.Engine
             {
                 parent.Children.Add(lnode);
             }
-            Nodes[lnode.Name] = lnode;
-            foreach(XmlNode childNode in ChildrenNodes)
+            nodes[lnode.Name] = lnode;
+            foreach (XmlNode childNode in ChildrenNodes)
             {
                 ParseNode(childNode, lnode);
             }
@@ -345,35 +389,7 @@ namespace MonoMenu.Engine
             root.PropagateMouse(MouseInput.MousePosition);
         }
 
-        public LogicalTree.LogicalNode FindNode(string name)
-        {
-            Queue q = new Queue();
-            q.Enqueue(root);
 
-            while(q.Count > 0)
-            {
-                LogicalTree.LogicalNode node = (LogicalTree.LogicalNode)q.Dequeue();
-                if(node.Name == name)
-                {
-                    return node;
-                }
-                foreach(LogicalTree.LogicalNode child in node.Children)
-                {
-                    q.Enqueue(child);
-                }
-            }
-            return null;
-        }
-
-        public void Resize(double width, double height)
-        {
-            root.Resize(width, height);
-        }
-
-        public void Resize()
-        {
-            Resize(graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
-        }
 
         public static Color ColorFromString(string colorcode)
         {
