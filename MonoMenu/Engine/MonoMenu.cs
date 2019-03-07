@@ -24,9 +24,11 @@ namespace MonoMenu.Engine
         private string filePath;
         private GraphicsDevice graphicsDevice;
         LogicalTree.LogicalNode root;
+        public Dictionary<string, LogicalTree.LogicalNode> Nodes;
         public MonoMenu(GraphicsDevice device)
         {
             this.graphicsDevice = device;
+            Nodes = new Dictionary<string, LogicalTree.LogicalNode>();
             MouseInput.LeftMouseButtonClick += LeftMouseButtonClick;
             MouseInput.LeftMouseButtonDoubleClick += LeftMouseButtonDoubleClick;
         }
@@ -106,9 +108,10 @@ namespace MonoMenu.Engine
             Color background = new Color();
             Color foreground = new Color();
             Color borderColor = new Color();
-            bool percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false;
+            bool percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, autoArrange = false;
             VerticalAlignment verticalAlignment = VerticalAlignment.Center, verticalTextAlignment = VerticalAlignment.Center;
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, horizontalTextAlignment = HorizontalAlignment.Center;
+            LogicalTree.LogicalNode.NodeOrientation orientation = LogicalTree.LogicalNode.NodeOrientation.Vertical;
             Visibility visibility = Visibility.Visible;
             foreach (XmlNode innerNode in node.ChildNodes)
             {
@@ -203,6 +206,14 @@ namespace MonoMenu.Engine
                 else if (innerNode.Name == "Visibility")
                 {
                     visibility = (Visibility)Enum.Parse(typeof(Visibility), innerNode.InnerText);
+                }
+                else if (innerNode.Name == "AutoArrange")
+                {
+                    autoArrange = bool.Parse(innerNode.InnerText);
+                }
+                else if (innerNode.Name == "Orientation")
+                {
+                    orientation = (LogicalTree.LogicalNode.NodeOrientation)Enum.Parse(typeof(LogicalTree.LogicalNode.NodeOrientation), innerNode.InnerText);
                 }
                 else if(innerNode.Name == "Events")
                 {
@@ -305,11 +316,14 @@ namespace MonoMenu.Engine
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
                 percentageX, percentageY, text);
             lnode.Events = events;
+            lnode.AutoArrangeChildren = autoArrange;
+            lnode.Orientation = orientation;
+            lnode.InvalidLayout = autoArrange;
             if (parent != null)
             {
                 parent.Children.Add(lnode);
             }
-
+            Nodes[lnode.Name] = lnode;
             foreach(XmlNode childNode in ChildrenNodes)
             {
                 ParseNode(childNode, lnode);

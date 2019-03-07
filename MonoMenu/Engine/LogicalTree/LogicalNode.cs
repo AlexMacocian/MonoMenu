@@ -16,22 +16,27 @@ namespace MonoMenu.Engine.LogicalTree
 {
     public class LogicalNode
     {
-        public EventHandler MouseOver, Click, DoubleClick, Dragging, MouseEnter, MouseLeave, LeftMouseDown, LeftMouseUp,
+        public enum NodeOrientation
+        {
+            Horizontal,
+            Vertical
+        }
+        protected EventHandler MouseOver, Click, DoubleClick, Dragging, MouseEnter, MouseLeave, LeftMouseDown, LeftMouseUp,
             RightMouseDown, RightMouseUp, OnResize;
-        private double desiredWidth, desiredHeight;
-        private VisualNode visualNode;
-        private LogicalNode parent;
-        private Point relativePosition, previousAbsolutePosition, desiredRelativePosition;
-        private bool recalculateAbsolutePosition = true, mouseOver, leftMousePressed, rightMousePressed,
-            percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false;
-        private VerticalAlignment verticalAlignment;
-        private HorizontalAlignment horizontalAlignment;
-        private List<MenuEvent> events, eventsToTrigger;
-        private string name;
-        private List<BaseAnimation> animations, animationsToRemove;
+        protected double desiredWidth, desiredHeight;
+        protected VisualNode visualNode;
+        protected LogicalNode parent;
+        protected Point relativePosition, previousAbsolutePosition, desiredRelativePosition;
+        protected bool recalculateAbsolutePosition = true, mouseOver, leftMousePressed, rightMousePressed,
+            percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, invalidLayout = true, autoArrangeChildren = false;
+        protected VerticalAlignment verticalAlignment;
+        protected HorizontalAlignment horizontalAlignment;
+        protected List<MenuEvent> events, eventsToTrigger;
+        protected string name;
+        protected List<BaseAnimation> animations, animationsToRemove;
+        protected List<LogicalNode> children;
+        protected NodeOrientation orientation= NodeOrientation.Vertical;
 
-
-        public List<LogicalNode> Children;
         public LogicalNode Parent
         {
             get
@@ -49,23 +54,6 @@ namespace MonoMenu.Engine.LogicalTree
             get
             {
                 return relativePosition;
-            }
-            set
-            {
-                relativePosition = value;
-                Queue q = new Queue();
-                q.Enqueue(this);
-                while (q.Count > 0)
-                {
-                    LogicalNode ln = (LogicalNode)q.Dequeue();
-                    ln.recalculateAbsolutePosition = true;
-                    foreach (LogicalNode child in ln.Children)
-                    {
-                        q.Enqueue(child);
-                    }
-                }
-
-                this.VisualNode.Modified = true;                
             }
         }
         public Point DesiredRelativePosition
@@ -182,7 +170,7 @@ namespace MonoMenu.Engine.LogicalTree
                 {
                     visualNode.Height = value;
                 }
-                if(horizontalAlignment != HorizontalAlignment.Left)
+                if(HorizontalAlignment != HorizontalAlignment.Left)
                 {
                     recalculateAbsolutePosition = true;
                 }
@@ -422,6 +410,55 @@ namespace MonoMenu.Engine.LogicalTree
                 percentageHeight = value;
             }
         }
+        public List<LogicalNode> Children
+        {
+            get
+            {
+                return children;
+            }
+
+            set
+            {
+                children = value;
+            }
+        }
+        public bool InvalidLayout
+        {
+            get
+            {
+                return invalidLayout;
+            }
+
+            set
+            {
+                invalidLayout = value;
+            }
+        }
+        public bool AutoArrangeChildren
+        {
+            get
+            {
+                return autoArrangeChildren;
+            }
+
+            set
+            {
+                autoArrangeChildren = value;
+            }
+        }
+        public NodeOrientation Orientation
+        {
+            get
+            {
+                return orientation;
+            }
+
+            set
+            {
+                orientation = value;
+            }
+        }
+
         public LogicalNode(GraphicsDevice device, string name, double rx, double ry, double width, double height)
         {
             Children = new List<LogicalNode>();
@@ -796,6 +833,43 @@ namespace MonoMenu.Engine.LogicalTree
 
         public void Update(GameTime gameTime)
         {
+            if(autoArrangeChildren && invalidLayout)
+            {
+                if(orientation == NodeOrientation.Vertical)
+                {
+                    double newHeight = this.Height / Children.Count;
+                    for(int i = 0; i < Children.Count; i++)
+                    {
+                        Children[i].VerticalAlignment = VerticalAlignment.Top;
+                        Children[i].HorizontalAlignment = HorizontalAlignment.Left;
+                        Children[i].PercentageX = false;
+                        Children[i].PercentageY = false;
+                        Children[i].PercentageHeight = false;
+                        Children[i].PercentageWidth = false;
+                        Children[i].DesiredHeight = newHeight;
+                        Children[i].DesiredRelativePosition = new Point(0, (int)Math.Round(i * newHeight));
+                        Children[i].DesiredWidth = this.Width;
+                    }
+                }
+                else
+                {
+                    double newWidth = this.Width / Children.Count;
+                    for(int i = 0; i < Children.Count; i++)
+                    {
+                        Children[i].VerticalAlignment = VerticalAlignment.Top;
+                        Children[i].HorizontalAlignment = HorizontalAlignment.Left;
+                        Children[i].PercentageX = false;
+                        Children[i].PercentageY = false;
+                        Children[i].PercentageHeight = false;
+                        Children[i].PercentageWidth = false;
+                        Children[i].DesiredWidth = newWidth;
+                        Children[i].DesiredRelativePosition = new Point((int)Math.Round(i * newWidth), 0);
+                        Children[i].DesiredHeight = this.Height;
+                    }
+                }
+                invalidLayout = false;
+            }
+
             foreach(MenuEvent ev in eventsToTrigger)
             {
                 ev.Trigger(this);
@@ -862,7 +936,7 @@ namespace MonoMenu.Engine.LogicalTree
             animation.Finished += AnimationFinished;
         }
 
-        private void AnimationFinished(Object sender, EventArgs e)
+        protected void AnimationFinished(Object sender, EventArgs e)
         {
             BaseAnimation finishedAnim = sender as BaseAnimation;
             foreach(MenuEvent ev in events)
