@@ -17,7 +17,7 @@ namespace MonoMenu.Engine.VisualTree
         private RenderTarget2D renderTarget;
         private GraphicsDevice graphicsDevice;
         private double width, height;
-        private VisualPrimitive type;
+        private Texture2D primitive;
         private LogicalNode LogicalNode;
         private Color backgroundColor, foregroundColor, borderColor;
         private string text = string.Empty;
@@ -46,16 +46,16 @@ namespace MonoMenu.Engine.VisualTree
             }
         }
 
-        public VisualPrimitive Type
+        public Texture2D Primitive
         {
             get
             {
-                return type;
+                return primitive;
             }
 
             set
             {
-                type = value;
+                primitive = value;
             }
         }
 
@@ -270,7 +270,7 @@ namespace MonoMenu.Engine.VisualTree
             this.text = "";
             this.VerticalTextAlignment = VerticalAlignment.Top;
             this.HorizontalTextAlignment = HorizontalAlignment.Left;
-            this.Type = new VisualPrimitives.Rectangle(device);
+            this.Primitive = PrimitiveHandler.GetRectangle(device);
         }
 
         public VisualNode(GraphicsDevice device, double width, double height, LogicalTree.LogicalNode lnode, Color backgroundColor, Color foregroundColor, Color borderColor, 
@@ -346,9 +346,15 @@ namespace MonoMenu.Engine.VisualTree
             graphicsDevice.SetRenderTarget(renderTarget);
             graphicsDevice.Clear(Color.Transparent);
             spriteBatch.Begin();
-            spriteBatch.Draw(type.Texture, new Microsoft.Xna.Framework.Rectangle(0, 0, (int)width, (int)height), borderColor);
-            spriteBatch.Draw(type.Texture, new Microsoft.Xna.Framework.Rectangle(borderSize, borderSize, (int)width - borderSize * 2, (int)height - borderSize * 2), backgroundColor);
-            if(!string.IsNullOrEmpty(text) && foregroundColor.A > 0)
+            if (primitive != null)
+            {
+                if (borderSize > 0)
+                {
+                    spriteBatch.Draw(primitive, new Microsoft.Xna.Framework.Rectangle(0, 0, (int)width, (int)height), borderColor);
+                }
+                spriteBatch.Draw(primitive, new Microsoft.Xna.Framework.Rectangle(borderSize, borderSize, (int)width - borderSize * 2, (int)height - borderSize * 2), backgroundColor);
+            }
+                if (!string.IsNullOrEmpty(text) && foregroundColor.A > 0)
             {
                 float scale = (float)fontSize / MonoMenu.defaultFontSize;
                 Vector2 size = MonoMenu.defaultFont.MeasureString(text);

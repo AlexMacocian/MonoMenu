@@ -478,7 +478,6 @@ namespace MonoMenu.Engine.LogicalTree
         public LogicalNode(GraphicsDevice device, string name, double rx, double ry, double width, double height,
             LogicalNode parent,
             Color background, Color foreground, Color borderColor, 
-            VisualPrimitives.VisualPrimitive primitive, 
             VerticalAlignment verticalAlignment = VerticalAlignment.Center, 
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment verticalTextAlignment = VerticalAlignment.Center, 
@@ -502,7 +501,7 @@ namespace MonoMenu.Engine.LogicalTree
             this.VisualNode.BorderColor = borderColor;
             this.VisualNode.BorderSize = borderSize;
             this.VisualNode.FontSize = fontSize;
-            this.VisualNode.Type = primitive;
+            this.VisualNode.Primitive = null;
             this.VisualNode.Text = text;
             this.PercentageX = percentageX;
             this.PercentageY = percentageY;

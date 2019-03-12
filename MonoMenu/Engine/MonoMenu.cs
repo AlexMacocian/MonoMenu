@@ -137,14 +137,7 @@ namespace MonoMenu.Engine
             List<XmlNode> ChildrenNodes = new List<XmlNode>();
 
             string primitive = node.Name;
-            Assembly a = Assembly.GetExecutingAssembly();
-            Type t = a.GetType("MonoMenu.Engine.VisualPrimitives." + primitive);
-            if (t == null)
-            {
-                return;
-            }
-            object type = t.GetConstructor(new[] { typeof(GraphicsDevice) }).Invoke(new object[] { graphicsDevice });
-            double rx = 0, ry = 0, width = 0, height = 0;
+            double rx = 0, ry = 0, width = 0, height = 0, radius = 0;
             int fontSize = 12, borderSize = 0;
             string name = null;
             string text = "";
@@ -206,6 +199,18 @@ namespace MonoMenu.Engine
                         s = s.Remove(s.Length - 1);
                     }
                     height = double.Parse(s);
+                }
+                else if (innerNode.Name == "Radius")
+                {
+                    string s = innerNode.InnerText;
+                    s = s.Replace(" ", "");
+                    if (s[s.Length - 1] == '%')
+                    {
+                        percentageHeight = true;
+                        percentageWidth = true;
+                        s = s.Remove(s.Length - 1);
+                    }
+                    radius = double.Parse(s);
                 }
                 else if (innerNode.Name == "Background")
                 {
@@ -356,9 +361,25 @@ namespace MonoMenu.Engine
             {
                 name = MonoMenu.GenerateString(12);
             }
-            LogicalTree.LogicalNode lnode = new LogicalTree.LogicalNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor, type as VisualPrimitives.VisualPrimitive,
+            LogicalTree.LogicalNode lnode = null;
+            if (primitive == "Rectangle")
+            {
+                lnode = new LogicalTree.RectangleNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor,
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
                 percentageX, percentageY, text);
+            }
+            else if(primitive == "Ellipse")
+            {
+                lnode = new LogicalTree.EllipseNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor,
+                verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
+                percentageX, percentageY, text);
+            }
+            else if(primitive == "Circle")
+            {
+                lnode = new LogicalTree.EllipseNode(graphicsDevice, name, rx, ry, radius * 2, radius * 2, parent, background, foreground, borderColor,
+                verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
+                percentageX, percentageY, text);
+            }             
             lnode.Events = events;
             lnode.AutoArrangeChildren = autoArrange;
             lnode.Orientation = orientation;
