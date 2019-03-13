@@ -38,6 +38,7 @@ namespace MonoMenu.Engine.LogicalTree
         protected List<BaseAnimation> animations, animationsToRemove;
         protected List<LogicalNode> children;
         protected NodeOrientation orientation= NodeOrientation.Vertical;
+        protected MonoMenu menu;
 
         public LogicalNode Parent
         {
@@ -490,9 +491,10 @@ namespace MonoMenu.Engine.LogicalTree
             }
         }
 
-        public LogicalNode(GraphicsDevice device, string name, double rx, double ry, double width, double height)
+        public LogicalNode(GraphicsDevice device, MonoMenu menu,string name, double rx, double ry, double width, double height)
         {
             Children = new List<LogicalNode>();
+            this.menu = menu;
             Events = new List<MenuEvent>();
             animations = new List<BaseAnimation>();
             animationsToRemove = new List<BaseAnimation>();
@@ -506,7 +508,7 @@ namespace MonoMenu.Engine.LogicalTree
             this.VerticalAlignment = VerticalAlignment.Top;
         }
 
-        public LogicalNode(GraphicsDevice device, string name, double rx, double ry, double width, double height,
+        public LogicalNode(GraphicsDevice device, MonoMenu menu,string name, double rx, double ry, double width, double height,
             LogicalNode parent,
             Color background, Color foreground, Color borderColor, 
             VerticalAlignment verticalAlignment = VerticalAlignment.Center, 
@@ -524,6 +526,7 @@ namespace MonoMenu.Engine.LogicalTree
             eventsToTrigger = new List<MenuEvent>();
             this.name = name;
             this.parent = parent;
+            this.menu = menu;
             this.VisualNode = new VisualNode(device, this);
             this.VisualNode.VerticalTextAlignment = verticalTextAlignment;
             this.VisualNode.HorizontalTextAlignment = horizontalTextAlignment;
@@ -963,10 +966,21 @@ namespace MonoMenu.Engine.LogicalTree
             return null;
         }
 
+        public void Dispose()
+        {
+            this.VisualNode.Dispose();
+        }
+
         public void AddAnimation(BaseAnimation animation)
         {
             animations.Add(animation);
             animation.Finished += AnimationFinished;
+        }
+
+        public void AddChild(LogicalNode node)
+        {
+            menu[node.Name] = node;
+            this.Children.Add(node);
         }
 
         protected void AnimationFinished(Object sender, EventArgs e)

@@ -41,7 +41,12 @@ namespace MonoMenu
 
         private void Window_ClientSizeChanged(object sender, System.EventArgs e)
         {
-            xMenu.Resize();
+            if (xMenu != null)
+            {
+                xMenu.Resize();
+                xMenu.Dispose();
+                xMenu = null;
+            }
         }
 
         /// <summary>
@@ -80,7 +85,10 @@ namespace MonoMenu
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             MouseInput.Poll(gameTime);
-            xMenu.Update(gameTime);
+            if (xMenu != null)
+            {
+                xMenu.Update(gameTime);
+            }
             Monitor.UpdateCalled();
             // TODO: Add your update logic here
 
@@ -95,14 +103,16 @@ namespace MonoMenu
         {
             Monitor.DrawCalled();
             GraphicsDevice.Clear(Color.Transparent);
-            xMenu.Draw(spriteBatch);
+            if (xMenu != null)
+            {
+                xMenu.Draw(spriteBatch);
+            }
             spriteBatch.Begin();
             spriteBatch.Draw(pixelText, new Rectangle(MouseInput.MousePosition, new Point(3, 3)), Color.Red);
             spriteBatch.DrawString(font, "UpdateRate: " + Monitor.UpdateRate, new Vector2(10, 10), Color.Red, 0, new Vector2(0, 0), 0.25f, SpriteEffects.None, 1);
             spriteBatch.DrawString(font, "DrawRate: " + Monitor.FrameRate, new Vector2(10, 30), Color.Red, 0, new Vector2(0, 0), 0.25f, SpriteEffects.None, 1);
             spriteBatch.End();
             // TODO: Add your drawing code here
-
             base.Draw(gameTime);
         }
     }

@@ -31,7 +31,6 @@ namespace MonoMenu.Engine
             set
             {
                 background = value;
-                setBackground = true;
                 StyleChanged?.Invoke(this, null);
             }
         }
@@ -45,7 +44,6 @@ namespace MonoMenu.Engine
             set
             {
                 borderColor = value;
-                setBorderColor = true;
                 StyleChanged?.Invoke(this, null);
             }
         }
@@ -59,7 +57,6 @@ namespace MonoMenu.Engine
             set
             {
                 borderSize = value;
-                setBorderSize = true;
                 StyleChanged?.Invoke(this, null);
             }
         }
@@ -73,7 +70,6 @@ namespace MonoMenu.Engine
             set
             {
                 fontSize = value;
-                setFontSize = true;
                 StyleChanged?.Invoke(this, null);
             }
         }
@@ -87,7 +83,6 @@ namespace MonoMenu.Engine
             set
             {
                 foreground = value;
-                setForeground = true;
                 StyleChanged?.Invoke(this, null);
             }
         }

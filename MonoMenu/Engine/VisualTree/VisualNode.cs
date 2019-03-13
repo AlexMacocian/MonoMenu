@@ -406,5 +406,17 @@ namespace MonoMenu.Engine.VisualTree
             }
             spriteBatch.End();
         }
+
+        public void Dispose()
+        {
+            renderTarget?.Dispose();
+            if (LogicalNode is ImageNode)
+            {
+                primitive?.Dispose();
+                primitive = null;
+            }
+            renderTarget = null;
+            LogicalNode = null;
+        }
     }
 }
