@@ -316,6 +316,17 @@ namespace MonoMenu.Engine.LogicalTree
                 VisualNode.ForegroundColor = value;
             }
         }
+        public SpriteFont Font
+        {
+            get
+            {
+                return visualNode.Font;
+            }
+            set
+            {
+                visualNode.Font = value;
+            }
+        }
         public int FontSize
         {
             get
@@ -475,11 +486,7 @@ namespace MonoMenu.Engine.LogicalTree
                 }
                 style = value;
                 style.StyleChanged += StyleChanged;
-                this.Foreground = style.Foreground;
-                this.Background = style.Background;
-                this.BorderColor = style.BorderColor;
-                this.BorderSize = style.BorderSize;
-                this.FontSize = style.FontSize;
+                StyleChanged(style, null);
             }
         }
 
@@ -508,7 +515,7 @@ namespace MonoMenu.Engine.LogicalTree
             HorizontalAlignment horizontalTextAlignment = HorizontalAlignment.Center,
             int fontSize = 0, int borderSize = 0, 
             bool percentageWidth = false, bool percentageHeight = false, bool percentageX = false, bool percentageY = false, 
-            string text = "")
+            string text = "", SpriteFont font = null)
         {
             Children = new List<LogicalNode>();
             Events = new List<MenuEvent>();
@@ -527,6 +534,10 @@ namespace MonoMenu.Engine.LogicalTree
             this.VisualNode.FontSize = fontSize;
             this.VisualNode.Primitive = null;
             this.VisualNode.Text = text;
+            if(font != null)
+            {
+                this.VisualNode.Font = font;
+            }
             this.PercentageX = percentageX;
             this.PercentageY = percentageY;
             this.PercentageWidth = percentageWidth;
@@ -975,7 +986,13 @@ namespace MonoMenu.Engine.LogicalTree
 
         protected void StyleChanged(Object sender, EventArgs e)
         {
-
+            this.Foreground = style.Foreground;
+            this.Background = style.Background;
+            this.BorderColor = style.BorderColor;
+            this.BorderSize = style.BorderSize;
+            this.FontSize = style.FontSize;
+            if (style.Font != null)
+                this.Font = style.Font;
         }
     }
 }

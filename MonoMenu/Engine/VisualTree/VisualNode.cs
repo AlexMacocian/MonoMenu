@@ -26,6 +26,7 @@ namespace MonoMenu.Engine.VisualTree
         private HorizontalAlignment horizontalTextAlignment;
         private VerticalAlignment verticalTextAlignment;
         private Visibility visibility;
+        private SpriteFont font;
 
         public bool Modified
         {
@@ -258,6 +259,20 @@ namespace MonoMenu.Engine.VisualTree
             }
         }
 
+        public SpriteFont Font
+        {
+            get
+            {
+                return font;
+            }
+
+            set
+            {
+                font = value;
+                Modified = true;
+            }
+        }
+
         public VisualNode(GraphicsDevice device, LogicalNode lnode)
         {
             this.LogicalNode = lnode;
@@ -275,7 +290,7 @@ namespace MonoMenu.Engine.VisualTree
 
         public VisualNode(GraphicsDevice device, double width, double height, LogicalTree.LogicalNode lnode, Color backgroundColor, Color foregroundColor, Color borderColor, 
             string text = "", int fontSize = 12, int borderSize = 0, VerticalAlignment verticalTextAlignment = VerticalAlignment.Center, 
-            HorizontalAlignment horizontalTextAlignment = HorizontalAlignment.Center)
+            HorizontalAlignment horizontalTextAlignment = HorizontalAlignment.Center, SpriteFont font = null)
         {
             graphicsDevice = device;
             this.LogicalNode = lnode;
@@ -289,7 +304,11 @@ namespace MonoMenu.Engine.VisualTree
             this.borderSize = borderSize;
             this.verticalTextAlignment = verticalTextAlignment;
             this.horizontalTextAlignment = horizontalTextAlignment;
-            renderTarget = new RenderTarget2D(device, (int)Math.Ceiling(width), (int)Math.Ceiling(height), false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);   
+            renderTarget = new RenderTarget2D(device, (int)Math.Ceiling(width), (int)Math.Ceiling(height), false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            if(font != null)
+            {
+                this.font = font;
+            }
         }
 
         public void RecursiveDraw(SpriteBatch spriteBatch)
@@ -361,7 +380,7 @@ namespace MonoMenu.Engine.VisualTree
                 }
                 spriteBatch.Draw(primitive, new Microsoft.Xna.Framework.Rectangle(borderSize, borderSize, (int)width - borderSize * 2, (int)height - borderSize * 2), backgroundColor);
             }
-                if (!string.IsNullOrEmpty(text) && foregroundColor.A > 0)
+                if (!string.IsNullOrEmpty(text) && foregroundColor.A > 0 && font != null)
             {
                 float scale = (float)fontSize / MonoMenu.defaultFontSize;
                 Vector2 size = MonoMenu.defaultFont.MeasureString(text);
@@ -383,7 +402,7 @@ namespace MonoMenu.Engine.VisualTree
                 {
                     pos.Y = (float)height / 2 - size.Y / 2;
                 }
-                spriteBatch.DrawString(MonoMenu.defaultFont, text, pos, foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
+                spriteBatch.DrawString(font, text, pos, foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
             }
             spriteBatch.End();
         }

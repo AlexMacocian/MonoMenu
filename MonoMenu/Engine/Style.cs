@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace MonoMenu.Engine
         public EventHandler StyleChanged;
 
         private string name;
-        bool setBorderColor, setBorderSize, setForeground, setBackground, setFontSize;
+        private SpriteFont font;
         private Color borderColor = Color.Transparent, foreground = Color.Transparent, background = Color.Transparent;
         private int borderSize = -1, fontSize = -1;
 
@@ -97,39 +98,17 @@ namespace MonoMenu.Engine
                 return name;
             }
         }
-        public bool SetBorderColor
+        public SpriteFont Font
         {
             get
             {
-                return setBorderColor;
+                return font;
             }
-        }
-        public bool SetBorderSize
-        {
-            get
+
+            set
             {
-                return setBorderSize;
-            }
-        }
-        public bool SetForeground
-        {
-            get
-            {
-                return setForeground;
-            }
-        }
-        public bool SetBackground
-        {
-            get
-            {
-                return setBackground;
-            }
-        }
-        public bool SetFontSize
-        {
-            get
-            {
-                return setFontSize;
+                font = value;
+                StyleChanged?.Invoke(this, null);
             }
         }
     }

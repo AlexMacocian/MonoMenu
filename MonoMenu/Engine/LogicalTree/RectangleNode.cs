@@ -25,7 +25,7 @@ namespace MonoMenu.Engine.LogicalTree
             HorizontalAlignment horizontalTextAlignment = HorizontalAlignment.Center,
             int fontSize = 0, int borderSize = 0,
             bool percentageWidth = false, bool percentageHeight = false, bool percentageX = false, bool percentageY = false,
-            string text = "") : base(device, name, rx, ry, width, height, parent, background, foreground, borderColor, verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight, percentageX, percentageY, text)
+            string text = "", SpriteFont font = null) : base(device, name, rx, ry, width, height, parent, background, foreground, borderColor, verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight, percentageX, percentageY, text, font)
         {
             this.visualNode.Primitive = VisualPrimitives.PrimitiveHandler.GetRectangle(device);
         }

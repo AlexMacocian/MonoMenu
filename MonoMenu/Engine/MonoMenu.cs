@@ -167,6 +167,7 @@ namespace MonoMenu.Engine
             Color foreground = new Color();
             Color borderColor = new Color();
             Style style = null;
+            SpriteFont font = null;
             bool percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, autoArrange = false;
             VerticalAlignment verticalAlignment = VerticalAlignment.Center, verticalTextAlignment = VerticalAlignment.Center;
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, horizontalTextAlignment = HorizontalAlignment.Center;
@@ -237,6 +238,10 @@ namespace MonoMenu.Engine
                 else if (innerNode.Name == "Style")
                 {
                     style = styles.Find(s => s.Name == innerNode.InnerText);
+                }
+                else if (innerNode.Name == "Font")
+                {
+                    font = contentManager.Load<SpriteFont>(innerNode.InnerText);
                 }
                 else if (innerNode.Name == "Background")
                 {
@@ -396,25 +401,25 @@ namespace MonoMenu.Engine
             {
                 lnode = new LogicalTree.RectangleNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor,
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
-                percentageX, percentageY, text);
+                percentageX, percentageY, text, font);
             }
             else if(primitive == "Ellipse")
             {
                 lnode = new LogicalTree.EllipseNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor,
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
-                percentageX, percentageY, text);
+                percentageX, percentageY, text, font);
             }
             else if(primitive == "Circle")
             {
                 lnode = new LogicalTree.EllipseNode(graphicsDevice, name, rx, ry, radius * 2, radius * 2, parent, background, foreground, borderColor,
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
-                percentageX, percentageY, text);
+                percentageX, percentageY, text, font);
             }
             else if(primitive == "Image")
             {
                 lnode = new LogicalTree.ImageNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor, 
                     contentManager.Load<Texture2D>(source), verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, 
-                    fontSize, borderSize, percentageWidth, percentageHeight, percentageX, percentageY, text);
+                    fontSize, borderSize, percentageWidth, percentageHeight, percentageX, percentageY, text, font);
             }
             if (style != null)
             {
