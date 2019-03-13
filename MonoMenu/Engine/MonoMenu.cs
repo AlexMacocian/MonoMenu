@@ -141,7 +141,7 @@ namespace MonoMenu.Engine
 
         private void ParseDoc(XmlDocument doc)
         {
-            root = new LogicalTree.LogicalNode(graphicsDevice, MonoMenu.GenerateString(12), 0, 0, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
+            root = new LogicalTree.LogicalNode(graphicsDevice, this, MonoMenu.GenerateString(12), 0, 0, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
             foreach (XmlNode node in doc.FirstChild.ChildNodes)
             {
                 if (node.Name == "Rectangle" ||
@@ -399,25 +399,25 @@ namespace MonoMenu.Engine
             LogicalTree.LogicalNode lnode = null;
             if (primitive == "Rectangle")
             {
-                lnode = new LogicalTree.RectangleNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor,
+                lnode = new LogicalTree.RectangleNode(graphicsDevice, this, name, rx, ry, width, height, parent, background, foreground, borderColor,
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
                 percentageX, percentageY, text, font);
             }
             else if(primitive == "Ellipse")
             {
-                lnode = new LogicalTree.EllipseNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor,
+                lnode = new LogicalTree.EllipseNode(graphicsDevice, this, name, rx, ry, width, height, parent, background, foreground, borderColor,
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
                 percentageX, percentageY, text, font);
             }
             else if(primitive == "Circle")
             {
-                lnode = new LogicalTree.EllipseNode(graphicsDevice, name, rx, ry, radius * 2, radius * 2, parent, background, foreground, borderColor,
+                lnode = new LogicalTree.EllipseNode(graphicsDevice, this, name, rx, ry, radius * 2, radius * 2, parent, background, foreground, borderColor,
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
                 percentageX, percentageY, text, font);
             }
             else if(primitive == "Image")
             {
-                lnode = new LogicalTree.ImageNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor, 
+                lnode = new LogicalTree.ImageNode(graphicsDevice, this, name, rx, ry, width, height, parent, background, foreground, borderColor, 
                     contentManager.Load<Texture2D>(source), verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, 
                     fontSize, borderSize, percentageWidth, percentageHeight, percentageX, percentageY, text, font);
             }
