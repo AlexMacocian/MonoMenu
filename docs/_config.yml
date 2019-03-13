@@ -2,6 +2,6 @@ theme: jekyll-theme-tactile
 # Site settings
 title: Monomenu
 subtitle: "A presentation framework for Monogame"
-url: "https://monogame.com" # the base hostname & protocol for your site
+url: "https://monogame.io" # the base hostname & protocol for your site
 # baseurl: "/the/subpath/of/your/site" # Set this value to "" if you want your site to be root
 baseurl: "index.html"
