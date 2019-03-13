@@ -350,7 +350,14 @@ namespace MonoMenu.Engine.VisualTree
             {
                 if (borderSize > 0)
                 {
-                    spriteBatch.Draw(primitive, new Microsoft.Xna.Framework.Rectangle(0, 0, (int)width, (int)height), borderColor);
+                    if (this.LogicalNode is ImageNode)
+                    {
+                        spriteBatch.Draw(VisualPrimitives.PrimitiveHandler.GetRectangle(graphicsDevice), new Microsoft.Xna.Framework.Rectangle(0, 0, (int)width, (int)height), borderColor);
+                    }
+                    else
+                    {
+                        spriteBatch.Draw(primitive, new Microsoft.Xna.Framework.Rectangle(0, 0, (int)width, (int)height), borderColor);
+                    }
                 }
                 spriteBatch.Draw(primitive, new Microsoft.Xna.Framework.Rectangle(borderSize, borderSize, (int)width - borderSize * 2, (int)height - borderSize * 2), backgroundColor);
             }
