@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using static MonoMenu.Engine.NodeProperties;
+using Microsoft.Xna.Framework.Content;
 
 namespace MonoMenu.Engine
 {
@@ -23,9 +24,23 @@ namespace MonoMenu.Engine
         public static int defaultFontSize = 48;
         private string filePath;
         private GraphicsDevice graphicsDevice;
+        private ContentManager contentManager;
         LogicalTree.LogicalNode root;
         private Dictionary<string, LogicalTree.LogicalNode> nodes;
+        private List<Style> styles;
 
+        public List<Style> Styles
+        {
+            get
+            {
+                return styles;
+            }
+
+            set
+            {
+                styles = value;
+            }
+        }
         public LogicalTree.LogicalNode this[string key]
         {
             get
@@ -38,10 +53,12 @@ namespace MonoMenu.Engine
             }
         }
 
-        public MonoMenu(GraphicsDevice device)
+        public MonoMenu(GraphicsDevice device, ContentManager contentManager)
         {
             this.graphicsDevice = device;
+            this.contentManager = contentManager;
             nodes = new Dictionary<string, LogicalTree.LogicalNode>();
+            Styles = new List<Style>();
             MouseInput.LeftMouseButtonClick += LeftMouseButtonClick;
             MouseInput.LeftMouseButtonDoubleClick += LeftMouseButtonDoubleClick;
         }
@@ -122,13 +139,17 @@ namespace MonoMenu.Engine
             Resize(graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
         }
 
-
         private void ParseDoc(XmlDocument doc)
         {
             root = new LogicalTree.LogicalNode(graphicsDevice, MonoMenu.GenerateString(12), 0, 0, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
-            foreach (XmlNode node in doc.ChildNodes)
+            foreach (XmlNode node in doc.FirstChild.ChildNodes)
             {
-                ParseNode(node, root);
+                if (node.Name == "Rectangle" ||
+                    node.Name == "Ellipse")
+                    ParseNode(node, root);
+                else if (node.Name == "Style")
+                    ParseStyle(node);
+
             }
         }
 
@@ -140,11 +161,12 @@ namespace MonoMenu.Engine
             double rx = 0, ry = 0, width = 0, height = 0, radius = 0;
             int fontSize = 12, borderSize = 0;
             string name = null;
-            string text = "";
+            string text = "", source = "";
             List<MenuEvent> events = new List<MenuEvent>();
             Color background = new Color();
             Color foreground = new Color();
             Color borderColor = new Color();
+            Style style = null;
             bool percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, autoArrange = false;
             VerticalAlignment verticalAlignment = VerticalAlignment.Center, verticalTextAlignment = VerticalAlignment.Center;
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, horizontalTextAlignment = HorizontalAlignment.Center;
@@ -212,6 +234,10 @@ namespace MonoMenu.Engine
                     }
                     radius = double.Parse(s);
                 }
+                else if (innerNode.Name == "Style")
+                {
+                    style = styles.Find(s => s.Name == innerNode.InnerText);
+                }
                 else if (innerNode.Name == "Background")
                 {
                     background = MonoMenu.ColorFromString(innerNode.InnerText);
@@ -239,6 +265,10 @@ namespace MonoMenu.Engine
                 else if (innerNode.Name == "Text")
                 {
                     text = innerNode.InnerText;
+                }
+                else if (innerNode.Name == "Source")
+                {
+                    source = innerNode.InnerText;
                 }
                 else if (innerNode.Name == "FontSize")
                 {
@@ -379,7 +409,17 @@ namespace MonoMenu.Engine
                 lnode = new LogicalTree.EllipseNode(graphicsDevice, name, rx, ry, radius * 2, radius * 2, parent, background, foreground, borderColor,
                 verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
                 percentageX, percentageY, text);
-            }             
+            }
+            else if(primitive == "Image")
+            {
+                lnode = new LogicalTree.ImageNode(graphicsDevice, name, rx, ry, width, height, parent, background, foreground, borderColor, 
+                    contentManager.Load<Texture2D>(source), verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, 
+                    fontSize, borderSize, percentageWidth, percentageHeight, percentageX, percentageY, text);
+            }
+            if (style != null)
+            {
+                lnode.Style = style;
+            }
             lnode.Events = events;
             lnode.AutoArrangeChildren = autoArrange;
             lnode.Orientation = orientation;
@@ -393,6 +433,70 @@ namespace MonoMenu.Engine
             {
                 ParseNode(childNode, lnode);
             }
+        }
+
+        private void ParseStyle(XmlNode node)
+        {
+            string name = string.Empty;
+            Color borderColor = Color.Transparent, background = Color.Transparent, foreground = Color.Transparent;
+            int borderSize = -1, fontSize = -1;
+            foreach (XmlNode innerNode in node)
+            {
+                if (innerNode.Name == "Name")
+                {
+                    name = innerNode.InnerText;
+                }
+                else if (innerNode.Name == "BorderColor")
+                {
+                    borderColor = ColorFromString(innerNode.InnerText);
+                }
+                else if (innerNode.Name == "BorderSize")
+                {
+                    borderSize = int.Parse(innerNode.InnerText);
+                }
+                else if (innerNode.Name == "FontSize")
+                {
+                    fontSize = int.Parse(innerNode.InnerText);
+                }
+                else if (innerNode.Name == "Foreground")
+                {
+                    foreground = ColorFromString(innerNode.InnerText);
+                }
+                else if (innerNode.Name == "Background")
+                {
+                    background = ColorFromString(innerNode.InnerText);
+                }
+            }
+            Style style;
+            if (string.IsNullOrEmpty(name))
+            {
+                style = new Style(GenerateString(8));
+            }
+            else
+            {
+                style = new Style(name);
+            }
+            if (borderColor != Color.Transparent)
+            {
+                style.BorderColor = borderColor;
+            }
+            if (foreground != Color.Transparent)
+            {
+                style.Foreground = foreground;
+            }
+            if (background != Color.Transparent)
+            {
+                style.Background = background;
+            }
+            if (borderSize != -1)
+            {
+                style.BorderSize = borderSize;
+            }
+            if (fontSize != -1)
+            {
+                style.FontSize = fontSize;
+            }
+            styles.Add(style);
         }
 
         private void LeftMouseButtonClick(object sender, object args)
@@ -409,7 +513,6 @@ namespace MonoMenu.Engine
         {
             root.PropagateMouse(MouseInput.MousePosition);
         }
-
 
 
         public static Color ColorFromString(string colorcode)

@@ -33,7 +33,6 @@ namespace MonoMenu
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            xMenu = new Engine.MonoMenu(GraphicsDevice);
             base.Initialize();
             Monitor.Initialize();
             this.Window.AllowUserResizing = true;
@@ -57,6 +56,7 @@ namespace MonoMenu
             pixelText = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixelText.SetData(new[] { Color.White });
             font = Content.Load<SpriteFont>("font");
+            xMenu = new Engine.MonoMenu(GraphicsDevice, Content);
             xMenu.Load("text.xml");
             // TODO: use this.Content to load your game content here
         }

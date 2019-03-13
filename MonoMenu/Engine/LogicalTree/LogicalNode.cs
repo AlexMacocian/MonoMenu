@@ -28,11 +28,13 @@ namespace MonoMenu.Engine.LogicalTree
         protected LogicalNode parent;
         protected Point relativePosition, previousAbsolutePosition, desiredRelativePosition;
         protected bool recalculateAbsolutePosition = true, mouseOver, leftMousePressed, rightMousePressed,
-            percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, invalidLayout = true, autoArrangeChildren = false;
+            percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, invalidLayout = true, 
+            autoArrangeChildren = false;
         protected VerticalAlignment verticalAlignment;
         protected HorizontalAlignment horizontalAlignment;
         protected List<MenuEvent> events, eventsToTrigger;
         protected string name;
+        protected Style style;
         protected List<BaseAnimation> animations, animationsToRemove;
         protected List<LogicalNode> children;
         protected NodeOrientation orientation= NodeOrientation.Vertical;
@@ -458,6 +460,28 @@ namespace MonoMenu.Engine.LogicalTree
                 orientation = value;
             }
         }
+        public Style Style
+        {
+            get
+            {
+                return style;
+            }
+
+            set
+            {
+                if(style != null)
+                {
+                    style.StyleChanged -= StyleChanged;
+                }
+                style = value;
+                style.StyleChanged += StyleChanged;
+                this.Foreground = style.Foreground;
+                this.Background = style.Background;
+                this.BorderColor = style.BorderColor;
+                this.BorderSize = style.BorderSize;
+                this.FontSize = style.FontSize;
+            }
+        }
 
         public LogicalNode(GraphicsDevice device, string name, double rx, double ry, double width, double height)
         {
@@ -512,7 +536,6 @@ namespace MonoMenu.Engine.LogicalTree
             this.DesiredHeight = height;
             this.VerticalAlignment = verticalAlignment;
             this.HorizontalAlignment = horizontalAlignment;
-
         }
 
         public bool PropagateMouse(Point mousePosition)
@@ -948,6 +971,11 @@ namespace MonoMenu.Engine.LogicalTree
                     }
                 }
             }
+        }
+
+        protected void StyleChanged(Object sender, EventArgs e)
+        {
+
         }
     }
 }
