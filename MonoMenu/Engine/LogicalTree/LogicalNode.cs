@@ -981,6 +981,8 @@ namespace MonoMenu.Engine.LogicalTree
         {
             menu[node.Name] = node;
             this.Children.Add(node);
+            this.VisualNode.Modified = true;
+            this.InvalidLayout = true;
         }
 
         protected void AnimationFinished(Object sender, EventArgs e)
