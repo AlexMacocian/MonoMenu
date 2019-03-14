@@ -1,5 +1,6 @@
 name: MonoMenu
 markdown: kramdown
 permalink: /blog/:year/:month/:day/:title
-
+url: "https://alexmacocian.github.io/MonoMenu/"
+baseurl: "/docs"
 theme: jekyll-theme-tactile
