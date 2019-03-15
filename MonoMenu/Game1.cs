@@ -44,8 +44,8 @@ namespace MonoMenu
             if (xMenu != null)
             {
                 xMenu.Resize();
-                xMenu.Dispose();
-                xMenu = null;
+                //xMenu.Dispose();
+                //xMenu = null;
             }
         }
 
@@ -62,7 +62,7 @@ namespace MonoMenu
             pixelText.SetData(new[] { Color.White });
             font = Content.Load<SpriteFont>("font");
             xMenu = new Engine.MonoMenu(GraphicsDevice, Content);
-            xMenu.Load("text.xml");
+            xMenu.Load("text.xaml");
             // TODO: use this.Content to load your game content here
         }
 
