@@ -1007,6 +1007,10 @@ namespace MonoMenu.Engine.LogicalTree
             this.BorderColor = style.BorderColor;
             this.BorderSize = style.BorderSize;
             this.FontSize = style.FontSize;
+            this.HorizontalAlignment = style.HorizontalAlignment;
+            this.VerticalAlignment = style.VerticalAlignment;
+            this.HorizontalTextAlignment = style.HorizontalTextAlignment;
+            this.VerticalTextAlignment = style.VerticalTextAlignment;
             if (style.Font != null)
                 this.Font = style.Font;
         }

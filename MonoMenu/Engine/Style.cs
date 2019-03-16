@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static MonoMenu.Engine.NodeProperties;
 
 namespace MonoMenu.Engine
 {
@@ -16,6 +17,8 @@ namespace MonoMenu.Engine
         private SpriteFont font;
         private Color borderColor = Color.Transparent, foreground = Color.Transparent, background = Color.Transparent;
         private int borderSize = -1, fontSize = -1;
+        private HorizontalAlignment horizontalAlignment, horizontalTextAlignment;
+        private VerticalAlignment verticalAlignment, verticalTextAlignment;
 
         public Style(string name)
         {
@@ -103,6 +106,41 @@ namespace MonoMenu.Engine
             set
             {
                 font = value;
+                StyleChanged?.Invoke(this, null);
+            }
+        }
+        public HorizontalAlignment HorizontalAlignment
+        {
+            get => horizontalAlignment;
+            set
+            {
+                horizontalAlignment = value;
+                StyleChanged?.Invoke(this, null);
+            }
+        }
+        public HorizontalAlignment HorizontalTextAlignment
+        {
+            get => horizontalTextAlignment;
+            set
+            {
+                horizontalTextAlignment = value;
+                StyleChanged?.Invoke(this, null);
+            }
+        }
+        public VerticalAlignment VerticalAlignment
+        {
+            get => verticalAlignment; set
+            {
+                verticalAlignment = value;
+                StyleChanged?.Invoke(this, null);
+            }
+        }
+        public VerticalAlignment VerticalTextAlignment
+        {
+            get => verticalTextAlignment;
+            set
+            {
+                verticalTextAlignment = value;
                 StyleChanged?.Invoke(this, null);
             }
         }
