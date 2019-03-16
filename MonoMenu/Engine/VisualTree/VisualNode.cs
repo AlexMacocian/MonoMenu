@@ -382,7 +382,7 @@ namespace MonoMenu.Engine.VisualTree
             }
                 if (!string.IsNullOrEmpty(text) && foregroundColor.A > 0 && font != null)
             {
-                float scale = (float)fontSize / MonoMenu.defaultFontSize;
+                float scale = (float)fontSize / font.MeasureString("D").X;
                 Vector2 size = MonoMenu.defaultFont.MeasureString(text);
                 size = new Vector2(size.X * scale, size.Y * scale);
                 Vector2 pos = new Vector2();

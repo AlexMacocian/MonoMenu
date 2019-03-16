@@ -462,14 +462,14 @@ namespace MonoMenu.Engine
             {
                 lnode.Style = style;
             }
-            lnode.DesiredHeight = height;
-            lnode.DesiredWidth = width;
-            lnode.Parent = parent;
-            lnode.DesiredRelativePosition = new Point((int)Math.Round(rx), (int)Math.Round(ry));
             lnode.PercentageHeight = percentageHeight;
             lnode.PercentageWidth = percentageWidth;
             lnode.PercentageX = percentageX;
             lnode.PercentageY = percentageY;
+            lnode.Parent = parent;
+            lnode.DesiredHeight = height;
+            lnode.DesiredWidth = width;
+            lnode.DesiredRelativePosition = new Point((int)Math.Round(rx), (int)Math.Round(ry));
             if (setBackgroundColor)
             {
                 lnode.Background = background;
@@ -782,7 +782,6 @@ namespace MonoMenu.Engine
                 name = MonoMenu.GenerateString(12);
             }
             LogicalTree.LogicalNode lnode = null;
-            LogicalTree.LogicalNode lnode = null;
             if (primitive == "Rectangle")
             {
                 lnode = new LogicalTree.RectangleNode(graphicsDevice, name, this);
@@ -805,14 +804,14 @@ namespace MonoMenu.Engine
             {
                 lnode.Style = style;
             }
-            lnode.DesiredHeight = height;
-            lnode.DesiredWidth = width;
-            lnode.Parent = parent;
-            lnode.DesiredRelativePosition = new Point((int)Math.Round(rx), (int)Math.Round(ry));
             lnode.PercentageHeight = percentageHeight;
             lnode.PercentageWidth = percentageWidth;
             lnode.PercentageX = percentageX;
             lnode.PercentageY = percentageY;
+            lnode.Parent = parent;
+            lnode.DesiredHeight = height;
+            lnode.DesiredWidth = width;
+            lnode.DesiredRelativePosition = new Point((int)Math.Round(rx), (int)Math.Round(ry));
             if (setBackgroundColor)
             {
                 lnode.Background = background;
@@ -871,8 +870,11 @@ namespace MonoMenu.Engine
         private void ParseStyleXaml(XmlNode node)
         {
             string name = string.Empty;
+            SpriteFont font = null;
             Color borderColor = Color.Transparent, background = Color.Transparent, foreground = Color.Transparent;
-            int borderSize = -1, fontSize = -1;
+            int borderSize = 0, fontSize = 0;
+            VerticalAlignment verticalAlignment = VerticalAlignment.Center, verticalTextAlignment = VerticalAlignment.Center;
+            HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, horizontalTextAlignment = HorizontalAlignment.Center;
             foreach (XmlAttribute attribute in node.Attributes)
             {
                 if (attribute.Name == "Name")
@@ -899,6 +901,26 @@ namespace MonoMenu.Engine
                 {
                     background = ColorFromString(attribute.Value);
                 }
+                else if(attribute.Name == "Font")
+                {
+                    font = ContentManager.Load<SpriteFont>(attribute.Value);
+                }
+                else if(attribute.Name == "VerticalAlignment")
+                {
+                    verticalAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), attribute.Value);
+                }
+                else if(attribute.Name == "VerticalTextAlignment")
+                {
+                    verticalTextAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), attribute.Value);
+                }
+                else if(attribute.Name == "HorizontalAlignment")
+                {
+                    horizontalAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), attribute.Value);
+                }
+                else if(attribute.Name == "HorizontalTextAlignment")
+                {
+                    horizontalTextAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), attribute.Value);
+                }
             }
             Style style;
             if (string.IsNullOrEmpty(name))
@@ -909,35 +931,28 @@ namespace MonoMenu.Engine
             {
                 style = new Style(name);
             }
-            if (borderColor != Color.Transparent)
-            {
-                style.BorderColor = borderColor;
-            }
-            if (foreground != Color.Transparent)
-            {
-                style.Foreground = foreground;
-            }
-            if (background != Color.Transparent)
-            {
-                style.Background = background;
-            }
-            if (borderSize != -1)
-            {
-                style.BorderSize = borderSize;
-            }
-            if (fontSize != -1)
-            {
-                style.FontSize = fontSize;
-            }
+            style.BorderColor = borderColor;
+            style.Foreground = foreground;
+            style.Background = background;
+            style.BorderSize = borderSize;
+            style.FontSize = fontSize;
+            style.Font = font;
+            style.VerticalAlignment = verticalAlignment;
+            style.VerticalTextAlignment = verticalTextAlignment;
+            style.HorizontalAlignment = horizontalAlignment;
+            style.HorizontalTextAlignment = horizontalTextAlignment;
             styles.Add(style);
         }
 
         private void ParseStyleXml(XmlNode node)
         {
             string name = string.Empty;
+            SpriteFont font = null;
             Color borderColor = Color.Transparent, background = Color.Transparent, foreground = Color.Transparent;
-            int borderSize = -1, fontSize = -1;
-            foreach (XmlNode innerNode in node)
+            int borderSize = 0, fontSize = 0;
+            VerticalAlignment verticalAlignment = VerticalAlignment.Center, verticalTextAlignment = VerticalAlignment.Center;
+            HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, horizontalTextAlignment = HorizontalAlignment.Center;
+            foreach (XmlNode innerNode in node.ChildNodes)
             {
                 if (innerNode.Name == "Name")
                 {
@@ -963,6 +978,26 @@ namespace MonoMenu.Engine
                 {
                     background = ColorFromString(innerNode.InnerText);
                 }
+                else if (innerNode.Name == "Font")
+                {
+                    font = ContentManager.Load<SpriteFont>(innerNode.InnerText);
+                }
+                else if (innerNode.Name == "VerticalAlignment")
+                {
+                    verticalAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), innerNode.InnerText);
+                }
+                else if (innerNode.Name == "VerticalTextAlignment")
+                {
+                    verticalTextAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), innerNode.InnerText);
+                }
+                else if (innerNode.Name == "HorizontalAlignment")
+                {
+                    horizontalAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), innerNode.InnerText);
+                }
+                else if (innerNode.Name == "HorizontalTextAlignment")
+                {
+                    horizontalTextAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), innerNode.InnerText);
+                }
             }
             Style style;
             if (string.IsNullOrEmpty(name))
@@ -973,26 +1008,16 @@ namespace MonoMenu.Engine
             {
                 style = new Style(name);
             }
-            if (borderColor != Color.Transparent)
-            {
-                style.BorderColor = borderColor;
-            }
-            if (foreground != Color.Transparent)
-            {
-                style.Foreground = foreground;
-            }
-            if (background != Color.Transparent)
-            {
-                style.Background = background;
-            }
-            if (borderSize != -1)
-            {
-                style.BorderSize = borderSize;
-            }
-            if (fontSize != -1)
-            {
-                style.FontSize = fontSize;
-            }
+            style.BorderColor = borderColor;
+            style.Foreground = foreground;
+            style.Background = background;
+            style.BorderSize = borderSize;
+            style.FontSize = fontSize;
+            style.Font = font;
+            style.VerticalAlignment = verticalAlignment;
+            style.VerticalTextAlignment = verticalTextAlignment;
+            style.HorizontalAlignment = horizontalAlignment;
+            style.HorizontalTextAlignment = horizontalTextAlignment;
             styles.Add(style);
         }
 
