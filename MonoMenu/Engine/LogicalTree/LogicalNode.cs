@@ -29,7 +29,9 @@ namespace MonoMenu.Engine.LogicalTree
         protected Point relativePosition, previousAbsolutePosition, desiredRelativePosition;
         protected bool recalculateAbsolutePosition = true, mouseOver, leftMousePressed, rightMousePressed,
             percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, invalidLayout = true, 
-            autoArrangeChildren = false;
+            autoArrangeChildren = false, setBackgroundColor = false, setForegroundColor = false, setBorderColor = false,
+            setFont = false, setBorderSize = false, setFontSize = false, setHorizontalAlignment = false, setVerticalAlignment = false,
+            setHorizontalTextAlignment = false, setVerticalTextAlignment = false;
         protected VerticalAlignment verticalAlignment;
         protected HorizontalAlignment horizontalAlignment;
         protected List<MenuEvent> events, eventsToTrigger;
@@ -228,6 +230,7 @@ namespace MonoMenu.Engine.LogicalTree
             {
                 verticalAlignment = value;
                 recalculateAbsolutePosition = true;
+                setVerticalAlignment = true;
             }
         }
         public HorizontalAlignment HorizontalAlignment
@@ -241,6 +244,7 @@ namespace MonoMenu.Engine.LogicalTree
             {
                 horizontalAlignment = value;
                 recalculateAbsolutePosition = true;
+                setHorizontalAlignment = true;
             }
         }
         public VerticalAlignment VerticalTextAlignment
@@ -252,6 +256,7 @@ namespace MonoMenu.Engine.LogicalTree
             set
             {
                 VisualNode.VerticalTextAlignment = value;
+                setVerticalTextAlignment = true;
             }
         }
         public HorizontalAlignment HorizontalTextAlignment
@@ -263,6 +268,7 @@ namespace MonoMenu.Engine.LogicalTree
             set
             {
                 VisualNode.HorizontalTextAlignment = value;
+                setHorizontalTextAlignment = true;
             }
         }
         public Visibility Visibility
@@ -304,6 +310,7 @@ namespace MonoMenu.Engine.LogicalTree
             set
             {
                 VisualNode.BackgroundColor = value;
+                setBackgroundColor = true;
             }
         }
         public Color Foreground
@@ -315,6 +322,7 @@ namespace MonoMenu.Engine.LogicalTree
             set
             {
                 VisualNode.ForegroundColor = value;
+                setForegroundColor = true;
             }
         }
         public SpriteFont Font
@@ -326,6 +334,7 @@ namespace MonoMenu.Engine.LogicalTree
             set
             {
                 visualNode.Font = value;
+                setFont = true;
             }
         }
         public int FontSize
@@ -337,6 +346,7 @@ namespace MonoMenu.Engine.LogicalTree
             set
             {
                 VisualNode.FontSize = value;
+                setFontSize = true;
             }
         }
         public string Text
@@ -359,6 +369,7 @@ namespace MonoMenu.Engine.LogicalTree
             set
             {
                 VisualNode.BorderColor = value;
+                setBorderColor = true;
             }
         }
         public int BorderSize
@@ -370,6 +381,7 @@ namespace MonoMenu.Engine.LogicalTree
             set
             {
                 VisualNode.BorderSize = value;
+                setBorderSize = true;
             }
         }
         public bool PercentageX
@@ -491,6 +503,18 @@ namespace MonoMenu.Engine.LogicalTree
             }
         }
 
+        public LogicalNode(GraphicsDevice device, string name, MonoMenu menu)
+        {
+            Children = new List<LogicalNode>();
+            this.menu = menu;
+            this.name = name;
+            Events = new List<MenuEvent>();
+            animations = new List<BaseAnimation>();
+            animationsToRemove = new List<BaseAnimation>();
+            eventsToTrigger = new List<MenuEvent>();
+            this.VisualNode = new VisualNode(device, this);
+        }
+
         public LogicalNode(GraphicsDevice device, MonoMenu menu,string name, double rx, double ry, double width, double height)
         {
             Children = new List<LogicalNode>();
@@ -529,12 +553,19 @@ namespace MonoMenu.Engine.LogicalTree
             this.menu = menu;
             this.VisualNode = new VisualNode(device, this);
             this.VisualNode.VerticalTextAlignment = verticalTextAlignment;
+            setVerticalTextAlignment = true;
             this.VisualNode.HorizontalTextAlignment = horizontalTextAlignment;
+            setHorizontalTextAlignment = true;
             this.VisualNode.ForegroundColor = foreground;
+            setForegroundColor = true;
             this.VisualNode.BackgroundColor = background;
+            setBackgroundColor = true;
             this.VisualNode.BorderColor = borderColor;
+            setBorderColor = true;
             this.VisualNode.BorderSize = borderSize;
+            setBorderSize = true;
             this.VisualNode.FontSize = fontSize;
+            setFontSize = true;
             this.VisualNode.Primitive = null;
             this.VisualNode.Text = text;
             if(font != null)
@@ -549,7 +580,9 @@ namespace MonoMenu.Engine.LogicalTree
             this.DesiredWidth = width;
             this.DesiredHeight = height;
             this.VerticalAlignment = verticalAlignment;
+            setVerticalAlignment = true;
             this.HorizontalAlignment = horizontalAlignment;
+            setHorizontalAlignment = true;
         }
 
         public bool PropagateMouse(Point mousePosition)
@@ -1002,17 +1035,48 @@ namespace MonoMenu.Engine.LogicalTree
 
         protected void StyleChanged(Object sender, EventArgs e)
         {
-            this.Foreground = style.Foreground;
-            this.Background = style.Background;
-            this.BorderColor = style.BorderColor;
-            this.BorderSize = style.BorderSize;
-            this.FontSize = style.FontSize;
-            this.HorizontalAlignment = style.HorizontalAlignment;
-            this.VerticalAlignment = style.VerticalAlignment;
-            this.HorizontalTextAlignment = style.HorizontalTextAlignment;
-            this.VerticalTextAlignment = style.VerticalTextAlignment;
-            if (style.Font != null)
-                this.Font = style.Font;
+            if (!setForegroundColor)
+            {
+                VisualNode.ForegroundColor = style.Foreground;
+            }
+            if (!setBackgroundColor)
+            {
+                VisualNode.BackgroundColor = style.Background;
+            }
+            if (!setBorderColor)
+            {
+                VisualNode.BorderColor = style.BorderColor;
+            }
+            if (!setBorderSize)
+            {
+                VisualNode.BorderSize = style.BorderSize;
+            }
+            if (!setFontSize)
+            {
+                VisualNode.FontSize = style.FontSize;
+            }
+            if (!setHorizontalAlignment)
+            {
+                horizontalAlignment = style.HorizontalAlignment;
+                recalculateAbsolutePosition = true;
+            }
+            if (!setVerticalAlignment)
+            {
+                verticalAlignment = style.VerticalAlignment;
+                recalculateAbsolutePosition = true;
+            }
+            if (!setHorizontalTextAlignment)
+            {
+                VisualNode.HorizontalTextAlignment = style.HorizontalTextAlignment;
+            }
+            if (!setVerticalTextAlignment)
+            {
+                VisualNode.VerticalTextAlignment = style.VerticalTextAlignment;
+            }
+            if (!setFont)
+            {
+                this.VisualNode.Font = style.Font;
+            }
         }
     }
 }

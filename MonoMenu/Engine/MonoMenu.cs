@@ -42,6 +42,9 @@ namespace MonoMenu.Engine
                 styles = value;
             }
         }
+
+        public ContentManager ContentManager { get => contentManager; set => contentManager = value; }
+
         public LogicalTree.LogicalNode this[string key]
         {
             get
@@ -189,7 +192,10 @@ namespace MonoMenu.Engine
             Color borderColor = new Color();
             Style style = null;
             SpriteFont font = null;
-            bool percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, autoArrange = false;
+            bool percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, autoArrange = false,
+                setBackgroundColor = false, setForegroundColor = false, setBorderColor = false,
+                setFont = false, setBorderSize = false, setFontSize = false, setHorizontalAlignment = false, setVerticalAlignment = false,
+                setHorizontalTextAlignment = false, setVerticalTextAlignment = false;
             VerticalAlignment verticalAlignment = VerticalAlignment.Center, verticalTextAlignment = VerticalAlignment.Center;
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, horizontalTextAlignment = HorizontalAlignment.Center;
             LogicalTree.LogicalNode.NodeOrientation orientation = LogicalTree.LogicalNode.NodeOrientation.Vertical;
@@ -263,30 +269,37 @@ namespace MonoMenu.Engine
                 else if (attribute.Name == "Font")
                 {
                     font = contentManager.Load<SpriteFont>(attribute.Value);
+                    setFont = true;
                 }
                 else if (attribute.Name == "Background")
                 {
                     background = MonoMenu.ColorFromString(attribute.Value);
+                    setBackgroundColor = true;
                 }
                 else if (attribute.Name == "Foreground")
                 {
                     foreground = MonoMenu.ColorFromString(attribute.Value);
+                    setForegroundColor = true;
                 }
                 else if (attribute.Name == "VerticalAlignment")
                 {
                     verticalAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), attribute.Value);
+                    setVerticalAlignment = true;
                 }
                 else if (attribute.Name == "HorizontalAlignment")
                 {
                     horizontalAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), attribute.Value);
+                    setHorizontalAlignment = true;
                 }
                 else if (attribute.Name == "VerticalTextAlignment")
                 {
                     verticalTextAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), attribute.Value);
+                    setVerticalTextAlignment = true;
                 }
                 else if (attribute.Name == "HorizontalTextAlignment")
                 {
                     horizontalTextAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), attribute.Value);
+                    setHorizontalTextAlignment = true;
                 }
                 else if (attribute.Name == "Text")
                 {
@@ -299,14 +312,17 @@ namespace MonoMenu.Engine
                 else if (attribute.Name == "FontSize")
                 {
                     fontSize = int.Parse(attribute.Value);
+                    setFontSize = true;
                 }
                 else if (attribute.Name == "BorderSize")
                 {
                     borderSize = int.Parse(attribute.Value);
+                    setBorderSize = true;
                 }
                 else if (attribute.Name == "BorderColor")
                 {
                     borderColor = MonoMenu.ColorFromString(attribute.Value);
+                    setBorderColor = true;
                 }
                 else if (attribute.Name == "Visibility")
                 {
@@ -426,31 +442,73 @@ namespace MonoMenu.Engine
             LogicalTree.LogicalNode lnode = null;
             if (primitive == "Rectangle")
             {
-                lnode = new LogicalTree.RectangleNode(graphicsDevice, this, name, rx, ry, width, height, parent, background, foreground, borderColor,
-                verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
-                percentageX, percentageY, text, font);
+                lnode = new LogicalTree.RectangleNode(graphicsDevice, name, this);
             }
             else if (primitive == "Ellipse")
             {
-                lnode = new LogicalTree.EllipseNode(graphicsDevice, this, name, rx, ry, width, height, parent, background, foreground, borderColor,
-                verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
-                percentageX, percentageY, text, font);
+                lnode = new LogicalTree.EllipseNode(graphicsDevice, name, this);
             }
             else if (primitive == "Circle")
             {
-                lnode = new LogicalTree.EllipseNode(graphicsDevice, this, name, rx, ry, radius * 2, radius * 2, parent, background, foreground, borderColor,
-                verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
-                percentageX, percentageY, text, font);
+                lnode = new LogicalTree.EllipseNode(graphicsDevice, name, this);
+                height = radius * 2;
+                width = radius * 2;
             }
             else if (primitive == "Image")
             {
-                lnode = new LogicalTree.ImageNode(graphicsDevice, this, name, rx, ry, width, height, parent, background, foreground, borderColor,
-                    contentManager.Load<Texture2D>(source), verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment,
-                    fontSize, borderSize, percentageWidth, percentageHeight, percentageX, percentageY, text, font);
+                lnode = new LogicalTree.ImageNode(graphicsDevice, this, name, contentManager.Load<Texture2D>(source));
             }
             if (style != null)
             {
                 lnode.Style = style;
+            }
+            lnode.DesiredHeight = height;
+            lnode.DesiredWidth = width;
+            lnode.Parent = parent;
+            lnode.DesiredRelativePosition = new Point((int)Math.Round(rx), (int)Math.Round(ry));
+            lnode.PercentageHeight = percentageHeight;
+            lnode.PercentageWidth = percentageWidth;
+            lnode.PercentageX = percentageX;
+            lnode.PercentageY = percentageY;
+            if (setBackgroundColor)
+            {
+                lnode.Background = background;
+            }
+            if (setForegroundColor)
+            {
+                lnode.Foreground = foreground;
+            }
+            if (setBorderColor)
+            {
+                lnode.BorderColor = borderColor;
+            }
+            if (setFont)
+            {
+                lnode.Font = font;
+            }
+            if (setFontSize)
+            {
+                lnode.FontSize = fontSize;
+            }
+            if (setBorderSize)
+            {
+                lnode.BorderSize = borderSize;
+            }
+            if (setHorizontalAlignment)
+            {
+                lnode.HorizontalAlignment = horizontalAlignment;
+            }
+            if (setHorizontalTextAlignment)
+            {
+                lnode.HorizontalTextAlignment = horizontalTextAlignment;
+            }
+            if (setVerticalAlignment)
+            {
+                lnode.VerticalAlignment = verticalAlignment;
+            }
+            if (setVerticalTextAlignment)
+            {
+                lnode.VerticalTextAlignment = verticalTextAlignment;
             }
             lnode.Events = events;
             lnode.AutoArrangeChildren = autoArrange;
@@ -482,7 +540,10 @@ namespace MonoMenu.Engine
             Color borderColor = new Color();
             Style style = null;
             SpriteFont font = null;
-            bool percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, autoArrange = false;
+            bool percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, autoArrange = false,
+                setBackgroundColor = false, setForegroundColor = false, setBorderColor = false,
+                setFont = false, setBorderSize = false, setFontSize = false, setHorizontalAlignment = false, setVerticalAlignment = false,
+                setHorizontalTextAlignment = false, setVerticalTextAlignment = false;
             VerticalAlignment verticalAlignment = VerticalAlignment.Center, verticalTextAlignment = VerticalAlignment.Center;
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, horizontalTextAlignment = HorizontalAlignment.Center;
             LogicalTree.LogicalNode.NodeOrientation orientation = LogicalTree.LogicalNode.NodeOrientation.Vertical;
@@ -556,30 +617,37 @@ namespace MonoMenu.Engine
                 else if (innerNode.Name == "Font")
                 {
                     font = contentManager.Load<SpriteFont>(innerNode.InnerText);
+                    setFont = true;
                 }
                 else if (innerNode.Name == "Background")
                 {
                     background = MonoMenu.ColorFromString(innerNode.InnerText);
+                    setBackgroundColor = true;
                 }
                 else if (innerNode.Name == "Foreground")
                 {
                     foreground = MonoMenu.ColorFromString(innerNode.InnerText);
+                    setForegroundColor = true;
                 }
                 else if (innerNode.Name == "VerticalAlignment")
                 {
                     verticalAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), innerNode.InnerText);
+                    setVerticalAlignment = true;
                 }
                 else if (innerNode.Name == "HorizontalAlignment")
                 {
                     horizontalAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), innerNode.InnerText);
+                    setHorizontalAlignment = true;
                 }
                 else if (innerNode.Name == "VerticalTextAlignment")
                 {
                     verticalTextAlignment = (VerticalAlignment)Enum.Parse(typeof(VerticalAlignment), innerNode.InnerText);
+                    setVerticalTextAlignment = true;
                 }
                 else if (innerNode.Name == "HorizontalTextAlignment")
                 {
                     horizontalTextAlignment = (HorizontalAlignment)Enum.Parse(typeof(HorizontalAlignment), innerNode.InnerText);
+                    setHorizontalTextAlignment = true;
                 }
                 else if (innerNode.Name == "Text")
                 {
@@ -592,14 +660,17 @@ namespace MonoMenu.Engine
                 else if (innerNode.Name == "FontSize")
                 {
                     fontSize = int.Parse(innerNode.InnerText);
+                    setFontSize = true;
                 }
                 else if (innerNode.Name == "BorderSize")
                 {
                     borderSize = int.Parse(innerNode.InnerText);
+                    setBorderSize = true;
                 }
                 else if (innerNode.Name == "BorderColor")
                 {
                     borderColor = MonoMenu.ColorFromString(innerNode.InnerText);
+                    setBorderColor = true;
                 }
                 else if (innerNode.Name == "Visibility")
                 {
@@ -711,33 +782,76 @@ namespace MonoMenu.Engine
                 name = MonoMenu.GenerateString(12);
             }
             LogicalTree.LogicalNode lnode = null;
+            LogicalTree.LogicalNode lnode = null;
             if (primitive == "Rectangle")
             {
-                lnode = new LogicalTree.RectangleNode(graphicsDevice, this, name, rx, ry, width, height, parent, background, foreground, borderColor,
-                verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
-                percentageX, percentageY, text, font);
+                lnode = new LogicalTree.RectangleNode(graphicsDevice, name, this);
             }
-            else if(primitive == "Ellipse")
+            else if (primitive == "Ellipse")
             {
-                lnode = new LogicalTree.EllipseNode(graphicsDevice, this, name, rx, ry, width, height, parent, background, foreground, borderColor,
-                verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
-                percentageX, percentageY, text, font);
+                lnode = new LogicalTree.EllipseNode(graphicsDevice, name, this);
             }
-            else if(primitive == "Circle")
+            else if (primitive == "Circle")
             {
-                lnode = new LogicalTree.EllipseNode(graphicsDevice, this, name, rx, ry, radius * 2, radius * 2, parent, background, foreground, borderColor,
-                verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, fontSize, borderSize, percentageWidth, percentageHeight,
-                percentageX, percentageY, text, font);
+                lnode = new LogicalTree.EllipseNode(graphicsDevice, name, this);
+                height = radius * 2;
+                width = radius * 2;
             }
-            else if(primitive == "Image")
+            else if (primitive == "Image")
             {
-                lnode = new LogicalTree.ImageNode(graphicsDevice, this, name, rx, ry, width, height, parent, background, foreground, borderColor, 
-                    contentManager.Load<Texture2D>(source), verticalAlignment, horizontalAlignment, verticalTextAlignment, horizontalTextAlignment, 
-                    fontSize, borderSize, percentageWidth, percentageHeight, percentageX, percentageY, text, font);
+                lnode = new LogicalTree.ImageNode(graphicsDevice, this, name, contentManager.Load<Texture2D>(source));
             }
             if (style != null)
             {
                 lnode.Style = style;
+            }
+            lnode.DesiredHeight = height;
+            lnode.DesiredWidth = width;
+            lnode.Parent = parent;
+            lnode.DesiredRelativePosition = new Point((int)Math.Round(rx), (int)Math.Round(ry));
+            lnode.PercentageHeight = percentageHeight;
+            lnode.PercentageWidth = percentageWidth;
+            lnode.PercentageX = percentageX;
+            lnode.PercentageY = percentageY;
+            if (setBackgroundColor)
+            {
+                lnode.Background = background;
+            }
+            if (setForegroundColor)
+            {
+                lnode.Foreground = foreground;
+            }
+            if (setBorderColor)
+            {
+                lnode.BorderColor = borderColor;
+            }
+            if (setFont)
+            {
+                lnode.Font = font;
+            }
+            if (setFontSize)
+            {
+                lnode.FontSize = fontSize;
+            }
+            if (setBorderSize)
+            {
+                lnode.BorderSize = borderSize;
+            }
+            if (setHorizontalAlignment)
+            {
+                lnode.HorizontalAlignment = horizontalAlignment;
+            }
+            if (setHorizontalTextAlignment)
+            {
+                lnode.HorizontalTextAlignment = horizontalTextAlignment;
+            }
+            if (setVerticalAlignment)
+            {
+                lnode.VerticalAlignment = verticalAlignment;
+            }
+            if (setVerticalTextAlignment)
+            {
+                lnode.VerticalTextAlignment = verticalTextAlignment;
             }
             lnode.Events = events;
             lnode.AutoArrangeChildren = autoArrange;

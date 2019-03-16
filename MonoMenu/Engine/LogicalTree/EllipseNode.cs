@@ -10,6 +10,11 @@ namespace MonoMenu.Engine.LogicalTree
 {
     class EllipseNode : LogicalNode
     {
+        public EllipseNode(GraphicsDevice device, string name, MonoMenu menu) : base(device, name, menu)
+        {
+            this.VisualNode.Primitive = VisualPrimitives.PrimitiveHandler.GetEllipse(device);
+        }
+
         public EllipseNode(GraphicsDevice device, MonoMenu menu, string name, double rx, double ry, double width, double height) : base(device, menu, name, rx, ry, width, height)
         {
             this.VisualNode.Primitive = VisualPrimitives.PrimitiveHandler.GetEllipse(device);

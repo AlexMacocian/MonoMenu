@@ -11,6 +11,11 @@ namespace MonoMenu.Engine.LogicalTree
 {
     public class RectangleNode : LogicalNode
     {
+        public RectangleNode(GraphicsDevice device, string name, MonoMenu menu) : base(device, name, menu)
+        {
+            this.visualNode.Primitive = VisualPrimitives.PrimitiveHandler.GetRectangle(device);
+        }
+
         public RectangleNode(GraphicsDevice device, MonoMenu menu, string name, double rx, double ry, double width, double height):base(device, menu, name, rx, ry, width, height)
         {
             this.visualNode.Primitive = VisualPrimitives.PrimitiveHandler.GetRectangle(device);

@@ -10,6 +10,12 @@ namespace MonoMenu.Engine.LogicalTree
 {
     class ImageNode : LogicalNode
     {
+        public ImageNode(GraphicsDevice device, MonoMenu menu, string name, Texture2D image) : base(device, name, menu)
+        {
+            this.visualNode.Primitive = image;
+            this.Background = Color.White;
+        }
+
         public ImageNode(GraphicsDevice device, MonoMenu menu, string name, double rx, double ry, double width, double height, Texture2D image) : base(device, menu, name, rx, ry, width, height)
         {
             this.visualNode.Primitive = image;
@@ -20,6 +26,18 @@ namespace MonoMenu.Engine.LogicalTree
         {
             this.visualNode.Primitive = image;
             this.Background = Color.White;
+        }
+
+        public string Source
+        {
+            get
+            {
+                return visualNode.Primitive.Name;
+            }
+            set
+            {
+                menu.ContentManager.Load<Texture2D>(value);
+            }
         }
     }
 }
