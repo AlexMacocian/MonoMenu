@@ -45,6 +45,9 @@
     <Compile Include="Engine\Animations\BaseAnimation.cs" />
     <Compile Include="Engine\Animations\ColorAnimation.cs" />
     <Compile Include="Engine\Animations\DoubleAnimation.cs" />
+    <Compile Include="Engine\Effects\BasicEffect.cs" />
+    <Compile Include="Engine\Effects\BoxBlurEffect.cs" />
+    <Compile Include="Engine\Effects\GaussianBlurEffect.cs" />
     <Compile Include="Engine\Events\AnimatedEvent.cs" />
     <Compile Include="Engine\Events\BasicEvent.cs" />
     <Compile Include="Engine\Events\MenuEvent.cs" />

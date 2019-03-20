@@ -13,6 +13,7 @@ using System.Xml;
 using static MonoMenu.Engine.NodeProperties;
 using Microsoft.Xna.Framework.Content;
 using System.IO;
+using MonoMenu.Engine.Effects;
 
 namespace MonoMenu.Engine
 {
@@ -72,6 +73,13 @@ namespace MonoMenu.Engine
             System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
             doc.LoadXml(xml);
             ParseXmlDoc(doc);
+        }
+
+        public void LoadXaml(string xaml)
+        {
+            System.Xml.XmlDocument doc = new XmlDocument();
+            doc.LoadXml(xaml);
+            ParseXamlDoc(doc);
         }
 
         public void Load(string filePath)
@@ -177,6 +185,7 @@ namespace MonoMenu.Engine
 
             }
         }
+
         private void ParseNodeXaml(XmlNode node, LogicalTree.LogicalNode parent)
         {
             List<XmlNode> ChildrenNodes = new List<XmlNode>();
@@ -187,6 +196,7 @@ namespace MonoMenu.Engine
             string name = null;
             string text = "", source = "";
             List<MenuEvent> events = new List<MenuEvent>();
+            List<Effects.BasicEffect> effects = new List<Effects.BasicEffect>();
             Color background = new Color();
             Color foreground = new Color();
             Color borderColor = new Color();
@@ -432,6 +442,38 @@ namespace MonoMenu.Engine
                         ChildrenNodes.Add(childNode);
                     }
                 }
+                else if (innerNode.Name == "Effects")
+                {
+                    foreach(XmlNode effectNode in innerNode.ChildNodes)
+                    {
+                        if(effectNode.Name == "Blur")
+                        {
+                            int bradius = 0;
+                            string kernel = "Box";
+                            foreach(XmlAttribute effectAttribute in effectNode.Attributes)
+                            {
+                                if(effectAttribute.Name == "Radius")
+                                {
+                                    bradius = int.Parse(effectAttribute.Value); 
+                                }
+                                else if(effectAttribute.Name == "Kernel")
+                                {
+                                    kernel = effectAttribute.Value;
+                                }
+                            }
+                            if (kernel == "Gaussian")
+                            {
+                                GaussianBlurEffect effect = new GaussianBlurEffect(bradius);
+                                effects.Add(effect);
+                            }
+                            else if (kernel == "Box")
+                            {
+                                BoxBlurEffect blurEffect = new BoxBlurEffect(bradius);
+                                effects.Add(blurEffect);
+                            }
+                        }
+                    }
+                }
             }
 
 
@@ -511,9 +553,11 @@ namespace MonoMenu.Engine
                 lnode.VerticalTextAlignment = verticalTextAlignment;
             }
             lnode.Events = events;
+            lnode.Effects = effects;
             lnode.AutoArrangeChildren = autoArrange;
             lnode.Orientation = orientation;
             lnode.InvalidLayout = autoArrange;
+            lnode.Text = text;
             if (parent != null)
             {
                 parent.Children.Add(lnode);
@@ -535,6 +579,7 @@ namespace MonoMenu.Engine
             string name = null;
             string text = "", source = "";
             List<MenuEvent> events = new List<MenuEvent>();
+            List<Effects.BasicEffect> effects = new List<Effects.BasicEffect>();
             Color background = new Color();
             Color foreground = new Color();
             Color borderColor = new Color();
@@ -776,6 +821,38 @@ namespace MonoMenu.Engine
                         ChildrenNodes.Add(childNode);
                     }
                 }
+                else if (innerNode.Name == "Effects")
+                {
+                    foreach(XmlNode effectNode in innerNode.ChildNodes)
+                    {
+                        if(effectNode.Name == "Blur")
+                        {
+                            int bradius = 0;
+                            string kernel = "Box";
+                            foreach(XmlNode innerEffectNode in effectNode.ChildNodes)
+                            {
+                                if(innerEffectNode.Name == "Radius")
+                                {
+                                    bradius = int.Parse(innerEffectNode.InnerText);
+                                }
+                                if(innerEffectNode.Name == "Kernel")
+                                {
+                                    kernel = innerEffectNode.InnerText;
+                                }
+                            }
+                            if (kernel == "Gaussian")
+                            {
+                                GaussianBlurEffect blurEffect = new GaussianBlurEffect(bradius);
+                                effects.Add(blurEffect);
+                            }
+                            else if(kernel == "Box")
+                            {
+                                BoxBlurEffect blurEffect = new BoxBlurEffect(bradius);
+                                effects.Add(blurEffect);
+                            }
+                        }
+                    }
+                }
             }
             if (name == null)
             {
@@ -853,9 +930,11 @@ namespace MonoMenu.Engine
                 lnode.VerticalTextAlignment = verticalTextAlignment;
             }
             lnode.Events = events;
+            lnode.Effects = effects;
             lnode.AutoArrangeChildren = autoArrange;
             lnode.Orientation = orientation;
             lnode.InvalidLayout = autoArrange;
+            lnode.Text = text;
             if (parent != null)
             {
                 parent.Children.Add(lnode);

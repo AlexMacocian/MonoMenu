@@ -21,12 +21,13 @@ namespace MonoMenu.Engine.VisualTree
         private LogicalNode LogicalNode;
         private Color backgroundColor, foregroundColor, borderColor;
         private string text = string.Empty;
-        private bool modified = true;
+        private bool modified = true, invalidRenderTarget = false;
         private int fontSize, borderSize;
         private HorizontalAlignment horizontalTextAlignment;
         private VerticalAlignment verticalTextAlignment;
         private Visibility visibility;
         private SpriteFont font;
+        private List<Effects.BasicEffect> effects;
 
         public bool Modified
         {
@@ -37,7 +38,8 @@ namespace MonoMenu.Engine.VisualTree
                 {
                     if (LogicalNode.Parent != null)
                     {
-                        LogicalNode.Parent.VisualNode.Modified = true;
+                        if(!LogicalNode.Parent.VisualNode.Modified)
+                            LogicalNode.Parent.VisualNode.Modified = true;
                     }
                 }
             }
@@ -82,14 +84,7 @@ namespace MonoMenu.Engine.VisualTree
                     Modified = true;
                 }
                 width = value;
-                if (renderTarget != null)
-                {
-                    renderTarget.Dispose();
-                }
-                if (width > 0 && height > 0)
-                {
-                    renderTarget = new RenderTarget2D(graphicsDevice, (int)Math.Ceiling(width), (int)Math.Ceiling(height), false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-                }
+                invalidRenderTarget = true;
             }
         }
 
@@ -107,14 +102,7 @@ namespace MonoMenu.Engine.VisualTree
                     Modified = true;
                 }
                 height = value;
-                if (renderTarget != null)
-                {
-                    renderTarget.Dispose();
-                }
-                if (width > 0 && height > 0)
-                {
-                    renderTarget = new RenderTarget2D(graphicsDevice, (int)Math.Ceiling(width), (int)Math.Ceiling(height), false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-                }
+                invalidRenderTarget = true;
             }
         }
 
@@ -273,6 +261,19 @@ namespace MonoMenu.Engine.VisualTree
             }
         }
 
+        public List<Effects.BasicEffect> Effects
+        {
+            get
+            {
+                return effects;
+            }
+            set
+            {
+                effects = value;
+                Modified = true;
+            }
+        }
+
         public VisualNode(GraphicsDevice device, LogicalNode lnode)
         {
             this.LogicalNode = lnode;
@@ -356,12 +357,30 @@ namespace MonoMenu.Engine.VisualTree
                     spriteBatch.Draw(node.VisualNode.renderTarget, new Microsoft.Xna.Framework.Rectangle((int)x, (int)y, (int)node.Width, (int)node.Height), Color.White);
                     spriteBatch.End();
                 }
+                if (effects != null)
+                {
+                    foreach (Effects.BasicEffect effect in effects)
+                    {
+                        if (!effect.Running)
+                        {
+                            effect.ApplyEffect(renderTarget);
+                        }
+                    }
+                }
                 modified = false;
             }
         }
 
         public void DrawToRenderTarget(SpriteBatch spriteBatch)
         {
+            if (invalidRenderTarget)
+            {
+                if(renderTarget != null)
+                {
+                    renderTarget.Dispose();
+                }
+                renderTarget = new RenderTarget2D(graphicsDevice, (int)Math.Ceiling(width), (int)Math.Ceiling(height), false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+            }
             graphicsDevice.SetRenderTarget(renderTarget);
             graphicsDevice.Clear(Color.Transparent);
             spriteBatch.Begin();

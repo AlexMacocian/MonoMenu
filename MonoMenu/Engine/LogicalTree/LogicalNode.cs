@@ -294,6 +294,17 @@ namespace MonoMenu.Engine.LogicalTree
                 events = value;
             }
         }
+        public List<Effects.BasicEffect> Effects
+        {
+            get
+            {
+                return VisualNode.Effects;
+            }
+            set
+            {
+                VisualNode.Effects = value;
+            }
+        }
         public string Name
         {
             get
