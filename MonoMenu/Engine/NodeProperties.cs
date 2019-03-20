@@ -29,5 +29,12 @@ namespace MonoMenu.Engine
             Visible,
             Hidden
         }
+
+        public enum FocusChange
+        {
+            GainedFocus,
+            LostFocus
+        }
+
     }
 }

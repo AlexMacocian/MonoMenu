@@ -55,6 +55,7 @@
     <Compile Include="Engine\LogicalTree\ImageNode.cs" />
     <Compile Include="Engine\LogicalTree\LogicalNode.cs" />
     <Compile Include="Engine\LogicalTree\RectangleNode.cs" />
+    <Compile Include="Engine\LogicalTree\TextboxNode.cs" />
     <Compile Include="Engine\MonoMenu.cs" />
     <Compile Include="Engine\Monitor.cs" />
     <Compile Include="Engine\MouseInput.cs" />

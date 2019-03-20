@@ -21,7 +21,7 @@ namespace MonoMenu.Engine.VisualTree
         private LogicalNode LogicalNode;
         private Color backgroundColor, foregroundColor, borderColor;
         private string text = string.Empty;
-        private bool modified = true, invalidRenderTarget = false;
+        private bool modified = true, invalidRenderTarget = false, textWrapping = false;
         private int fontSize, borderSize;
         private HorizontalAlignment horizontalTextAlignment;
         private VerticalAlignment verticalTextAlignment;
@@ -46,6 +46,22 @@ namespace MonoMenu.Engine.VisualTree
             get
             {
                 return modified;
+            }
+        }
+
+        public bool TextWrapping
+        {
+            get
+            {
+                return textWrapping;
+            }
+            set
+            {
+                if(value != textWrapping)
+                {
+                    Modified = true;
+                }
+                textWrapping = value;
             }
         }
 
@@ -401,27 +417,36 @@ namespace MonoMenu.Engine.VisualTree
             }
                 if (!string.IsNullOrEmpty(text) && foregroundColor.A > 0 && font != null)
             {
-                float scale = (float)fontSize / font.MeasureString("D").X;
-                Vector2 size = MonoMenu.defaultFont.MeasureString(text);
-                size = new Vector2(size.X * scale, size.Y * scale);
-                Vector2 pos = new Vector2();
-                if(horizontalTextAlignment == HorizontalAlignment.Right)
+                Vector2 fm = font.MeasureString("D");
+                float scale = (float)fontSize / fm.X;
+                fm.X *= scale;
+                fm.Y *= scale;
+                List<string> lines = GetLines(scale);
+                for (int i = 0; i < lines.Count; i++)
                 {
-                    pos.X = (float)width - size.X;
+                    string line = lines[i];
+                    Vector2 size = MonoMenu.defaultFont.MeasureString(line);
+                    size = new Vector2(size.X * scale, size.Y * scale);
+                    Vector2 pos = new Vector2();
+                    if (horizontalTextAlignment == HorizontalAlignment.Right)
+                    {
+                        pos.X = (float)width - size.X;
+                    }
+                    else if (horizontalTextAlignment == HorizontalAlignment.Center || horizontalTextAlignment == HorizontalAlignment.Stretch)
+                    {
+                        pos.X = (float)width / 2 - size.X / 2;
+                    }
+                    if (verticalTextAlignment == VerticalAlignment.Bottom)
+                    {
+                        pos.Y = (float)height - size.Y;
+                    }
+                    else if (verticalTextAlignment == VerticalAlignment.Center || verticalTextAlignment == VerticalAlignment.Stretch)
+                    {
+                        pos.Y = (float)height / 2 - size.Y / 2;
+                    }
+                    pos.Y += fm.Y * i + fm.Y / 2 - fm.Y * lines.Count / 2;
+                    spriteBatch.DrawString(font, line, pos, foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
                 }
-                else if(horizontalTextAlignment == HorizontalAlignment.Center || horizontalTextAlignment == HorizontalAlignment.Stretch)
-                {
-                    pos.X = (float)width / 2 - size.X / 2;
-                }
-                if(verticalTextAlignment == VerticalAlignment.Bottom)
-                {
-                    pos.Y = (float)height - size.Y;
-                }
-                else if(verticalTextAlignment == VerticalAlignment.Center || verticalTextAlignment == VerticalAlignment.Stretch)
-                {
-                    pos.Y = (float)height / 2 - size.Y / 2;
-                }
-                spriteBatch.DrawString(font, text, pos, foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
             }
             spriteBatch.End();
         }
@@ -436,6 +461,43 @@ namespace MonoMenu.Engine.VisualTree
             }
             renderTarget = null;
             LogicalNode = null;
+        }
+
+        private List<string> GetLines(float scale)
+        {
+            List<string> lines = new List<string>();
+            float px = 0;
+            if (textWrapping)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach(char c in text)
+                {
+                    if (c != '\n')
+                    {
+                        float charWidth = font.GetGlyphs()[c].WidthIncludingBearings * scale;
+                        if (px + charWidth >= Width)
+                        {
+                            lines.Add(sb.ToString());
+                            sb.Clear();
+                            px = 0;
+                        }
+                        sb.Append(c);
+                        px += charWidth;
+                    }
+                    else
+                    {
+                        lines.Add(sb.ToString());
+                        sb.Clear();
+                        px = 0;
+                    }
+                }
+                lines.Add(sb.ToString());
+            }
+            else
+            {
+                lines.Add(text);
+            }
+            return lines;
         }
     }
 }

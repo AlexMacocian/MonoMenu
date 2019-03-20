@@ -21,8 +21,9 @@ namespace MonoMenu.Engine.LogicalTree
             Horizontal,
             Vertical
         }
-        protected EventHandler MouseOver, Click, DoubleClick, Dragging, MouseEnter, MouseLeave, LeftMouseDown, LeftMouseUp,
+        public EventHandler MouseOver, Click, DoubleClick, Dragging, MouseEnter, MouseLeave, LeftMouseDown, LeftMouseUp,
             RightMouseDown, RightMouseUp, OnResize;
+        public EventHandler<FocusChange> OnFocusChange;
         protected double desiredWidth, desiredHeight;
         protected VisualNode visualNode;
         protected LogicalNode parent;
@@ -31,7 +32,7 @@ namespace MonoMenu.Engine.LogicalTree
             percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, invalidLayout = true, 
             autoArrangeChildren = false, setBackgroundColor = false, setForegroundColor = false, setBorderColor = false,
             setFont = false, setBorderSize = false, setFontSize = false, setHorizontalAlignment = false, setVerticalAlignment = false,
-            setHorizontalTextAlignment = false, setVerticalTextAlignment = false;
+            setHorizontalTextAlignment = false, setVerticalTextAlignment = false, focused = false;
         protected VerticalAlignment verticalAlignment;
         protected HorizontalAlignment horizontalAlignment;
         protected List<MenuEvent> events, eventsToTrigger;
@@ -513,6 +514,36 @@ namespace MonoMenu.Engine.LogicalTree
                 StyleChanged(style, null);
             }
         }
+        public bool Focused
+        {
+            get
+            {
+                return focused;
+            }
+            set
+            {
+                focused = value;
+                if (focused)
+                {
+                    OnFocusChange?.Invoke(this, FocusChange.GainedFocus);
+                }
+                else
+                {
+                    OnFocusChange?.Invoke(this, FocusChange.LostFocus);
+                }
+            }
+        }
+        public bool TextWrapping
+        {
+            get
+            {
+                return visualNode.TextWrapping;
+            }
+            set
+            {
+                visualNode.TextWrapping = value;
+            }
+        }
 
         public LogicalNode(GraphicsDevice device, string name, MonoMenu menu)
         {
@@ -524,76 +555,7 @@ namespace MonoMenu.Engine.LogicalTree
             animationsToRemove = new List<BaseAnimation>();
             eventsToTrigger = new List<MenuEvent>();
             this.VisualNode = new VisualNode(device, this);
-        }
-
-        public LogicalNode(GraphicsDevice device, MonoMenu menu,string name, double rx, double ry, double width, double height)
-        {
-            Children = new List<LogicalNode>();
-            this.menu = menu;
-            Events = new List<MenuEvent>();
-            animations = new List<BaseAnimation>();
-            animationsToRemove = new List<BaseAnimation>();
-            eventsToTrigger = new List<MenuEvent>();
-            this.name = name;
-            this.VisualNode = new VisualNode(device, this);
-            this.DesiredWidth = width;
-            this.DesiredHeight = height;
-            this.DesiredRelativePosition = new Point((int)Math.Round(rx), (int)Math.Round(ry));
-            this.HorizontalAlignment = HorizontalAlignment.Left;
-            this.VerticalAlignment = VerticalAlignment.Top;
-        }
-
-        public LogicalNode(GraphicsDevice device, MonoMenu menu,string name, double rx, double ry, double width, double height,
-            LogicalNode parent,
-            Color background, Color foreground, Color borderColor, 
-            VerticalAlignment verticalAlignment = VerticalAlignment.Center, 
-            HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment verticalTextAlignment = VerticalAlignment.Center, 
-            HorizontalAlignment horizontalTextAlignment = HorizontalAlignment.Center,
-            int fontSize = 0, int borderSize = 0, 
-            bool percentageWidth = false, bool percentageHeight = false, bool percentageX = false, bool percentageY = false, 
-            string text = "", SpriteFont font = null)
-        {
-            Children = new List<LogicalNode>();
-            Events = new List<MenuEvent>();
-            animations = new List<BaseAnimation>();
-            animationsToRemove = new List<BaseAnimation>();
-            eventsToTrigger = new List<MenuEvent>();
-            this.name = name;
-            this.parent = parent;
-            this.menu = menu;
-            this.VisualNode = new VisualNode(device, this);
-            this.VisualNode.VerticalTextAlignment = verticalTextAlignment;
-            setVerticalTextAlignment = true;
-            this.VisualNode.HorizontalTextAlignment = horizontalTextAlignment;
-            setHorizontalTextAlignment = true;
-            this.VisualNode.ForegroundColor = foreground;
-            setForegroundColor = true;
-            this.VisualNode.BackgroundColor = background;
-            setBackgroundColor = true;
-            this.VisualNode.BorderColor = borderColor;
-            setBorderColor = true;
-            this.VisualNode.BorderSize = borderSize;
-            setBorderSize = true;
-            this.VisualNode.FontSize = fontSize;
-            setFontSize = true;
-            this.VisualNode.Primitive = null;
-            this.VisualNode.Text = text;
-            if(font != null)
-            {
-                this.VisualNode.Font = font;
-            }
-            this.PercentageX = percentageX;
-            this.PercentageY = percentageY;
-            this.PercentageWidth = percentageWidth;
-            this.PercentageHeight = percentageHeight;
-            this.DesiredRelativePosition = new Point((int)Math.Round(rx), (int)Math.Round(ry));
-            this.DesiredWidth = width;
-            this.DesiredHeight = height;
-            this.VerticalAlignment = verticalAlignment;
-            setVerticalAlignment = true;
-            this.HorizontalAlignment = horizontalAlignment;
-            setHorizontalAlignment = true;
+            Click += NodeClicked;
         }
 
         public bool PropagateMouse(Point mousePosition)
@@ -608,14 +570,19 @@ namespace MonoMenu.Engine.LogicalTree
                 if (Children.Count > 0)
                 {
                     bool ret = false;
-                    foreach (LogicalNode child in Children)
+                    for (int i = Children.Count - 1; i >= 0; i--)
                     {
+                        LogicalNode child = Children[i];
                         if (child.PropagateMouse(mousePosition))
                         {
                             ret = true;
                         }
+                        if (ret)
+                        {
+                            break;
+                        }
                     }
-                    if(ret == false)
+                    if (ret == false)
                     {
                         bool mEnter = false, mPressed = false, mLPressed = false, mRPressed = false, mReleased = false, 
                             mLReleased = false, mRReleased = false;
@@ -813,11 +780,16 @@ namespace MonoMenu.Engine.LogicalTree
                 if (Children.Count > 0)
                 {
                     bool ret = false;
-                    foreach (LogicalNode child in Children)
+                    for (int i = Children.Count - 1; i >= 0; i--)
                     {
+                        LogicalNode child = Children[i];
                         if (child.PropagateClick(mousePosition))
                         {
                             ret = true;
+                        }
+                        if (ret)
+                        {
+                            break;
                         }
                     }
                     if (ret == false)
@@ -868,11 +840,16 @@ namespace MonoMenu.Engine.LogicalTree
                 if (Children.Count > 0)
                 {
                     bool ret = false;
-                    foreach (LogicalNode child in Children)
+                    for (int i = Children.Count - 1; i >= 0; i--)
                     {
+                        LogicalNode child = Children[i];
                         if (child.PropagateDoubleClick(mousePosition))
                         {
                             ret = true;
+                        }
+                        if (ret)
+                        {
+                            break;
                         }
                     }
                     if (ret == false)
@@ -911,7 +888,7 @@ namespace MonoMenu.Engine.LogicalTree
             }
         }
 
-        public void Update(GameTime gameTime)
+        public virtual void Update(GameTime gameTime)
         {
             if(autoArrangeChildren && invalidLayout)
             {
@@ -1027,6 +1004,16 @@ namespace MonoMenu.Engine.LogicalTree
             this.Children.Add(node);
             this.VisualNode.Modified = true;
             this.InvalidLayout = true;
+        }
+
+        public virtual void OnTextChange(TextInputEventArgs args)
+        {
+
+        }
+
+        private void NodeClicked(object sender, object args)
+        {
+            Focused = true;
         }
 
         protected void AnimationFinished(Object sender, EventArgs e)

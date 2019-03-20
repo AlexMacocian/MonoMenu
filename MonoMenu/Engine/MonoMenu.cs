@@ -128,6 +128,17 @@ namespace MonoMenu.Engine
             spriteBatch.End();
         }
 
+        public void OnTextInput(TextInputEventArgs e)
+        {
+            foreach(KeyValuePair<string, LogicalTree.LogicalNode> kp in nodes)
+            {
+                if (kp.Value.Focused)
+                {
+                    kp.Value.OnTextChange(e);
+                }
+            }
+        }
+
         public LogicalTree.LogicalNode FindNode(string name)
         {
             Queue q = new Queue();
@@ -160,28 +171,30 @@ namespace MonoMenu.Engine
 
         private void ParseXmlDoc(XmlDocument doc)
         {
-            root = new LogicalTree.LogicalNode(graphicsDevice, this, MonoMenu.GenerateString(12), 0, 0, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
+            root = new LogicalTree.LogicalNode(graphicsDevice, MonoMenu.GenerateString(12), this);
+            root.DesiredWidth = graphicsDevice.PresentationParameters.BackBufferWidth;
+            root.DesiredHeight = graphicsDevice.PresentationParameters.BackBufferHeight;
             foreach (XmlNode node in doc.FirstChild.ChildNodes)
-            {
-                if (node.Name == "Rectangle" ||
-                    node.Name == "Ellipse")
-                    ParseNodeXml(node, root);
-                else if (node.Name == "Style")
+            {                 
+                if (node.Name == "Style")
                     ParseStyleXml(node);
+                else
+                    ParseNodeXml(node, root);
 
             }
         }
 
         private void ParseXamlDoc(XmlDocument doc)
         {
-            root = new LogicalTree.LogicalNode(graphicsDevice, this, MonoMenu.GenerateString(12), 0, 0, graphicsDevice.PresentationParameters.BackBufferWidth, graphicsDevice.PresentationParameters.BackBufferHeight);
+            root = new LogicalTree.LogicalNode(graphicsDevice, MonoMenu.GenerateString(12), this);
+            root.DesiredWidth = graphicsDevice.PresentationParameters.BackBufferWidth;
+            root.DesiredHeight = graphicsDevice.PresentationParameters.BackBufferHeight;
             foreach (XmlNode node in doc.FirstChild.ChildNodes)
-            {
-                if (node.Name == "Rectangle" ||
-                    node.Name == "Ellipse")
-                    ParseNodeXaml(node, root);
-                else if (node.Name == "Style")
+            {                    
+                if (node.Name == "Style")
                     ParseStyleXaml(node);
+                else
+                    ParseNodeXaml(node, root);
 
             }
         }
@@ -205,7 +218,7 @@ namespace MonoMenu.Engine
             bool percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, autoArrange = false,
                 setBackgroundColor = false, setForegroundColor = false, setBorderColor = false,
                 setFont = false, setBorderSize = false, setFontSize = false, setHorizontalAlignment = false, setVerticalAlignment = false,
-                setHorizontalTextAlignment = false, setVerticalTextAlignment = false;
+                setHorizontalTextAlignment = false, setVerticalTextAlignment = false, textWrapping = false;
             VerticalAlignment verticalAlignment = VerticalAlignment.Center, verticalTextAlignment = VerticalAlignment.Center;
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, horizontalTextAlignment = HorizontalAlignment.Center;
             LogicalTree.LogicalNode.NodeOrientation orientation = LogicalTree.LogicalNode.NodeOrientation.Vertical;
@@ -341,6 +354,10 @@ namespace MonoMenu.Engine
                 else if (attribute.Name == "AutoArrange")
                 {
                     autoArrange = bool.Parse(attribute.Value);
+                }
+                else if (attribute.Name == "TextWrapping")
+                {
+                    textWrapping = bool.Parse(attribute.Value);
                 }
                 else if (attribute.Name == "Orientation")
                 {
@@ -500,6 +517,10 @@ namespace MonoMenu.Engine
             {
                 lnode = new LogicalTree.ImageNode(graphicsDevice, this, name, contentManager.Load<Texture2D>(source));
             }
+            else if (primitive == "Textbox")
+            {
+                lnode = new LogicalTree.TextboxNode(graphicsDevice, name, this);
+            }
             if (style != null)
             {
                 lnode.Style = style;
@@ -555,8 +576,10 @@ namespace MonoMenu.Engine
             lnode.Events = events;
             lnode.Effects = effects;
             lnode.AutoArrangeChildren = autoArrange;
+            lnode.TextWrapping = textWrapping;
             lnode.Orientation = orientation;
             lnode.InvalidLayout = autoArrange;
+            lnode.OnFocusChange += NodeFocused;
             lnode.Text = text;
             if (parent != null)
             {
@@ -588,7 +611,7 @@ namespace MonoMenu.Engine
             bool percentageX = false, percentageY = false, percentageWidth = false, percentageHeight = false, autoArrange = false,
                 setBackgroundColor = false, setForegroundColor = false, setBorderColor = false,
                 setFont = false, setBorderSize = false, setFontSize = false, setHorizontalAlignment = false, setVerticalAlignment = false,
-                setHorizontalTextAlignment = false, setVerticalTextAlignment = false;
+                setHorizontalTextAlignment = false, setVerticalTextAlignment = false, textWrapping = false;
             VerticalAlignment verticalAlignment = VerticalAlignment.Center, verticalTextAlignment = VerticalAlignment.Center;
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center, horizontalTextAlignment = HorizontalAlignment.Center;
             LogicalTree.LogicalNode.NodeOrientation orientation = LogicalTree.LogicalNode.NodeOrientation.Vertical;
@@ -724,6 +747,10 @@ namespace MonoMenu.Engine
                 else if (innerNode.Name == "AutoArrange")
                 {
                     autoArrange = bool.Parse(innerNode.InnerText);
+                }
+                else if (innerNode.Name == "TextWrapping")
+                {
+                    textWrapping = bool.Parse(innerNode.InnerText);
                 }
                 else if (innerNode.Name == "Orientation")
                 {
@@ -877,6 +904,10 @@ namespace MonoMenu.Engine
             {
                 lnode = new LogicalTree.ImageNode(graphicsDevice, this, name, contentManager.Load<Texture2D>(source));
             }
+            else if (primitive == "Textbox")
+            {
+                lnode = new LogicalTree.TextboxNode(graphicsDevice, name, this);
+            }
             if (style != null)
             {
                 lnode.Style = style;
@@ -934,6 +965,8 @@ namespace MonoMenu.Engine
             lnode.AutoArrangeChildren = autoArrange;
             lnode.Orientation = orientation;
             lnode.InvalidLayout = autoArrange;
+            lnode.TextWrapping = textWrapping;
+            lnode.OnFocusChange += NodeFocused;
             lnode.Text = text;
             if (parent != null)
             {
@@ -1115,6 +1148,22 @@ namespace MonoMenu.Engine
             root.PropagateMouse(MouseInput.MousePosition);
         }
 
+        private void NodeFocused(object sender, FocusChange focusChangeArg)
+        {
+            if (focusChangeArg == FocusChange.GainedFocus)
+            {
+                LogicalTree.LogicalNode focusedNode = sender as LogicalTree.LogicalNode;
+                System.Diagnostics.Debug.WriteLine(focusedNode.Name);
+                foreach (KeyValuePair<string, LogicalTree.LogicalNode> kp in nodes)
+                {
+                    LogicalTree.LogicalNode node = kp.Value;
+                    if (node != focusedNode)
+                    {
+                        node.Focused = false;
+                    }
+                }
+            }
+        }
 
         public static Color ColorFromString(string colorcode)
         {

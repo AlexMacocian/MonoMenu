@@ -37,6 +37,15 @@ namespace MonoMenu
             Monitor.Initialize();
             this.Window.AllowUserResizing = true;
             this.Window.ClientSizeChanged += Window_ClientSizeChanged;
+            this.Window.TextInput += Window_TextInput;
+        }
+
+        private void Window_TextInput(object sender, TextInputEventArgs e)
+        {
+            if(xMenu != null)
+            {
+                xMenu.OnTextInput(e);
+            }
         }
 
         private void Window_ClientSizeChanged(object sender, System.EventArgs e)
