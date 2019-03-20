@@ -439,12 +439,17 @@ namespace MonoMenu.Engine.VisualTree
                     if (verticalTextAlignment == VerticalAlignment.Bottom)
                     {
                         pos.Y = (float)height - size.Y;
+                        pos.Y -= fm.Y * (lines.Count - i - 1);
                     }
                     else if (verticalTextAlignment == VerticalAlignment.Center || verticalTextAlignment == VerticalAlignment.Stretch)
                     {
                         pos.Y = (float)height / 2 - size.Y / 2;
+                        pos.Y += fm.Y * i + fm.Y / 2 - fm.Y * lines.Count / 2;
                     }
-                    pos.Y += fm.Y * i + fm.Y / 2 - fm.Y * lines.Count / 2;
+                    else
+                    {
+                        pos.Y += fm.Y * i;
+                    }
                     spriteBatch.DrawString(font, line, pos, foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
                 }
             }
