@@ -466,7 +466,8 @@ namespace MonoMenu.Engine
                         if(effectNode.Name == "Blur")
                         {
                             int bradius = 0;
-                            string kernel = "Box";
+                            BlurEffect.Kernel kernel = BlurEffect.Kernel.Gaussian;
+                            bool hardwareAccelerated = false;
                             foreach(XmlAttribute effectAttribute in effectNode.Attributes)
                             {
                                 if(effectAttribute.Name == "Radius")
@@ -475,19 +476,18 @@ namespace MonoMenu.Engine
                                 }
                                 else if(effectAttribute.Name == "Kernel")
                                 {
-                                    kernel = effectAttribute.Value;
+                                    kernel = (BlurEffect.Kernel)Enum.Parse(typeof(BlurEffect.Kernel), effectAttribute.Value);
+                                }
+                                else if(effectAttribute.Name == "HardwareAccelerated")
+                                {
+                                    hardwareAccelerated = bool.Parse(effectAttribute.Value);
                                 }
                             }
-                            if (kernel == "Gaussian")
-                            {
-                                GaussianBlurEffect effect = new GaussianBlurEffect(bradius);
-                                effects.Add(effect);
-                            }
-                            else if (kernel == "Box")
-                            {
-                                BoxBlurEffect blurEffect = new BoxBlurEffect(bradius);
-                                effects.Add(blurEffect);
-                            }
+                            BlurEffect blurEffect = new BlurEffect(graphicsDevice);
+                            blurEffect.Radius = bradius;
+                            blurEffect.HardwareAccelerated = hardwareAccelerated;
+                            blurEffect.KernelType = kernel;
+                            effects.Add(blurEffect);
                         }
                     }
                 }
@@ -855,28 +855,28 @@ namespace MonoMenu.Engine
                         if(effectNode.Name == "Blur")
                         {
                             int bradius = 0;
-                            string kernel = "Box";
+                            BlurEffect.Kernel kernel = BlurEffect.Kernel.Gaussian;
+                            bool hardwareAccelerated = false;
                             foreach(XmlNode innerEffectNode in effectNode.ChildNodes)
                             {
                                 if(innerEffectNode.Name == "Radius")
                                 {
                                     bradius = int.Parse(innerEffectNode.InnerText);
                                 }
-                                if(innerEffectNode.Name == "Kernel")
+                                else if(innerEffectNode.Name == "Kernel")
                                 {
-                                    kernel = innerEffectNode.InnerText;
+                                    kernel = (BlurEffect.Kernel)Enum.Parse(typeof(BlurEffect.Kernel) ,innerEffectNode.InnerText);
+                                }
+                                else if(innerEffectNode.Name == "HardwareAccelerated")
+                                {
+                                    hardwareAccelerated = bool.Parse(innerEffectNode.InnerText);
                                 }
                             }
-                            if (kernel == "Gaussian")
-                            {
-                                GaussianBlurEffect blurEffect = new GaussianBlurEffect(bradius);
-                                effects.Add(blurEffect);
-                            }
-                            else if(kernel == "Box")
-                            {
-                                BoxBlurEffect blurEffect = new BoxBlurEffect(bradius);
-                                effects.Add(blurEffect);
-                            }
+                            BlurEffect effect = new BlurEffect(graphicsDevice);
+                            effect.Radius = bradius;
+                            effect.HardwareAccelerated = hardwareAccelerated;
+                            effect.KernelType = kernel;
+                            effects.Add(effect);
                         }
                     }
                 }

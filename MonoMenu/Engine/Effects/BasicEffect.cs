@@ -16,7 +16,7 @@ namespace MonoMenu.Engine.Effects
 
         public bool Running { get => running;}
 
-        public virtual void ApplyEffect(RenderTarget2D renderTarget)
+        public virtual void ApplyEffect(RenderTarget2D renderTarget, SpriteBatch spriteBatch)
         {
             running = false;
         }

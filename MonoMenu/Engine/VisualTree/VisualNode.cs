@@ -379,7 +379,7 @@ namespace MonoMenu.Engine.VisualTree
                     {
                         if (!effect.Running)
                         {
-                            effect.ApplyEffect(renderTarget);
+                            effect.ApplyEffect(renderTarget, spriteBatch);
                         }
                     }
                 }
