@@ -28,7 +28,7 @@ namespace MonoMenu.Engine.Effects
         public Kernel KernelType { get => kernelType; set => kernelType = value; }
         public int Radius { get => radius; set => radius = value; }
 
-        public BlurEffect(GraphicsDevice device)
+        public BlurEffect(string name, GraphicsDevice device) : base(name)
         {
             this.graphicsDevice = device;
             Stream s = new FileStream(System.IO.Path.GetFullPath(@"..\..\..\..\Engine\Effects\Blur.mgfxo"), FileMode.Open);
@@ -52,7 +52,7 @@ namespace MonoMenu.Engine.Effects
 
         private void ApplyGPUEffect(RenderTarget2D renderTarget, SpriteBatch spriteBatch)
         {
-            float[] kernel = ComputeKernel(0.3f*(radius / 2 - 1) + 0.8f, radius);
+            float[] kernel = ComputeKernel(0.3f*(radius) + 0.8f, radius);
             ComputeOffsets(renderTarget.Width, renderTarget.Height);
             effect.Parameters["kernel_size"].SetValue((float)radius * 2 + 1);
 

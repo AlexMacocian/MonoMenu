@@ -208,8 +208,8 @@ namespace MonoMenu.Engine
             int fontSize = 12, borderSize = 0;
             string name = null;
             string text = "", source = "";
-            List<MenuEvent> events = new List<MenuEvent>();
-            List<Effects.BasicEffect> effects = new List<Effects.BasicEffect>();
+            Dictionary<string, MenuEvent> events = new Dictionary<string, MenuEvent>();
+            Dictionary<string, Effects.BasicEffect> effects = new Dictionary<string, Effects.BasicEffect>();
             Color background = new Color();
             Color foreground = new Color();
             Color borderColor = new Color();
@@ -405,7 +405,7 @@ namespace MonoMenu.Engine
                             {
                                 evName = MonoMenu.GenerateString(8);
                             }
-                            events.Add(new BasicEvent(evName, evType, value, trigName, evTarget));
+                            events[evName] = (new BasicEvent(evName, evType, value, trigName, evTarget));
                         }
                         else if (eventNode.Name == "AnimatedEvent")
                         {
@@ -448,7 +448,7 @@ namespace MonoMenu.Engine
                             {
                                 evName = MonoMenu.GenerateString(8);
                             }
-                            events.Add(new AnimatedEvent(evName, evType, evTarget, from, to, duration, trigName));
+                            events[evName] = (new AnimatedEvent(evName, evType, evTarget, from, to, duration, trigName));
                         }
                     }
                 }
@@ -468,6 +468,7 @@ namespace MonoMenu.Engine
                             int bradius = 0;
                             BlurEffect.Kernel kernel = BlurEffect.Kernel.Gaussian;
                             bool hardwareAccelerated = false;
+                            string efname = GenerateString(8);
                             foreach(XmlAttribute effectAttribute in effectNode.Attributes)
                             {
                                 if(effectAttribute.Name == "Radius")
@@ -482,12 +483,16 @@ namespace MonoMenu.Engine
                                 {
                                     hardwareAccelerated = bool.Parse(effectAttribute.Value);
                                 }
+                                else if(effectAttribute.Name == "Name")
+                                {
+                                    efname = effectAttribute.Value;
+                                }
                             }
-                            BlurEffect blurEffect = new BlurEffect(graphicsDevice);
+                            BlurEffect blurEffect = new BlurEffect(efname, graphicsDevice);
                             blurEffect.Radius = bradius;
                             blurEffect.HardwareAccelerated = hardwareAccelerated;
                             blurEffect.KernelType = kernel;
-                            effects.Add(blurEffect);
+                            effects[efname] = (blurEffect);
                         }
                     }
                 }
@@ -601,8 +606,8 @@ namespace MonoMenu.Engine
             int fontSize = 12, borderSize = 0;
             string name = null;
             string text = "", source = "";
-            List<MenuEvent> events = new List<MenuEvent>();
-            List<Effects.BasicEffect> effects = new List<Effects.BasicEffect>();
+            Dictionary<string, MenuEvent> events = new Dictionary<string, MenuEvent>();
+            Dictionary<string, Effects.BasicEffect> effects = new Dictionary<string, Effects.BasicEffect>();
             Color background = new Color();
             Color foreground = new Color();
             Color borderColor = new Color();
@@ -794,7 +799,7 @@ namespace MonoMenu.Engine
                             {
                                 evName = MonoMenu.GenerateString(8);
                             }
-                            events.Add(new BasicEvent(evName, evType, value, trigName, evTarget));
+                            events[evName] = (new BasicEvent(evName, evType, value, trigName, evTarget));
                         }
                         else if (eventNode.Name == "AnimatedEvent")
                         {
@@ -837,7 +842,7 @@ namespace MonoMenu.Engine
                             {
                                 evName = MonoMenu.GenerateString(8);
                             }
-                            events.Add(new AnimatedEvent(evName, evType, evTarget, from, to, duration, trigName));
+                            events[evName] = (new AnimatedEvent(evName, evType, evTarget, from, to, duration, trigName));
                         }
                     }
                 }
@@ -857,6 +862,7 @@ namespace MonoMenu.Engine
                             int bradius = 0;
                             BlurEffect.Kernel kernel = BlurEffect.Kernel.Gaussian;
                             bool hardwareAccelerated = false;
+                            string efname = GenerateString(8);
                             foreach(XmlNode innerEffectNode in effectNode.ChildNodes)
                             {
                                 if(innerEffectNode.Name == "Radius")
@@ -871,12 +877,16 @@ namespace MonoMenu.Engine
                                 {
                                     hardwareAccelerated = bool.Parse(innerEffectNode.InnerText);
                                 }
+                                else if(innerEffectNode.Name == "Name")
+                                {
+                                    efname = innerEffectNode.InnerText;
+                                }
                             }
-                            BlurEffect effect = new BlurEffect(graphicsDevice);
+                            BlurEffect effect = new BlurEffect(efname, graphicsDevice);
                             effect.Radius = bradius;
                             effect.HardwareAccelerated = hardwareAccelerated;
                             effect.KernelType = kernel;
-                            effects.Add(effect);
+                            effects[efname] = (effect);
                         }
                     }
                 }

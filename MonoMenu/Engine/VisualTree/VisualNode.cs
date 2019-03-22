@@ -27,7 +27,7 @@ namespace MonoMenu.Engine.VisualTree
         private VerticalAlignment verticalTextAlignment;
         private Visibility visibility;
         private SpriteFont font;
-        private List<Effects.BasicEffect> effects;
+        private Dictionary<string, Effects.BasicEffect> effects;
 
         public bool Modified
         {
@@ -277,7 +277,7 @@ namespace MonoMenu.Engine.VisualTree
             }
         }
 
-        public List<Effects.BasicEffect> Effects
+        public Dictionary<string, Effects.BasicEffect> Effects
         {
             get
             {
@@ -375,7 +375,7 @@ namespace MonoMenu.Engine.VisualTree
                 }
                 if (effects != null)
                 {
-                    foreach (Effects.BasicEffect effect in effects)
+                    foreach (Effects.BasicEffect effect in effects.Values)
                     {
                         if (!effect.Running)
                         {
@@ -430,16 +430,20 @@ namespace MonoMenu.Engine.VisualTree
                     Vector2 pos = new Vector2();
                     if (horizontalTextAlignment == HorizontalAlignment.Right)
                     {
-                        pos.X = (float)width - size.X;
+                        pos.X = (float)width - size.X - borderSize;
                     }
                     else if (horizontalTextAlignment == HorizontalAlignment.Center || horizontalTextAlignment == HorizontalAlignment.Stretch)
                     {
                         pos.X = (float)width / 2 - size.X / 2;
                     }
+                    else
+                    {
+                        pos.X += borderSize;
+                    }
                     if (verticalTextAlignment == VerticalAlignment.Bottom)
                     {
                         pos.Y = (float)height - size.Y;
-                        pos.Y -= fm.Y * (lines.Count - i - 1);
+                        pos.Y -= fm.Y * (lines.Count - i - 1) - borderSize;
                     }
                     else if (verticalTextAlignment == VerticalAlignment.Center || verticalTextAlignment == VerticalAlignment.Stretch)
                     {
@@ -448,9 +452,13 @@ namespace MonoMenu.Engine.VisualTree
                     }
                     else
                     {
-                        pos.Y += fm.Y * i;
+                        pos.Y += fm.Y * i + borderSize;
                     }
-                    spriteBatch.DrawString(font, line, pos, foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
+
+                    if (pos.Y >= borderSize && pos.Y + size.Y <= height - borderSize)
+                    {
+                        spriteBatch.DrawString(font, line, pos, foregroundColor, 0, new Vector2(0, 0), scale, SpriteEffects.None, 1);
+                    }
                 }
             }
             spriteBatch.End();
@@ -480,7 +488,7 @@ namespace MonoMenu.Engine.VisualTree
                     if (c != '\n')
                     {
                         float charWidth = font.GetGlyphs()[c].WidthIncludingBearings * scale;
-                        if (px + charWidth >= Width)
+                        if (px + charWidth >= Width - borderSize * 2)
                         {
                             lines.Add(sb.ToString());
                             sb.Clear();

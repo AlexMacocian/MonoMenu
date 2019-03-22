@@ -35,10 +35,12 @@ namespace MonoMenu.Engine.LogicalTree
             setHorizontalTextAlignment = false, setVerticalTextAlignment = false, focused = false;
         protected VerticalAlignment verticalAlignment;
         protected HorizontalAlignment horizontalAlignment;
-        protected List<MenuEvent> events, eventsToTrigger;
+        protected Dictionary<string, MenuEvent> events;
+        protected List<MenuEvent> eventsToTrigger;
         protected string name;
         protected Style style;
-        protected List<BaseAnimation> animations, animationsToRemove;
+        protected List<BaseAnimation> animationsToRemove;
+        protected Dictionary<string, BaseAnimation> animations;
         protected List<LogicalNode> children;
         protected NodeOrientation orientation= NodeOrientation.Vertical;
         protected MonoMenu menu;
@@ -283,7 +285,7 @@ namespace MonoMenu.Engine.LogicalTree
                 VisualNode.Visibility = value;
             }
         }
-        public List<MenuEvent> Events
+        public Dictionary<string, MenuEvent> Events
         {
             get
             {
@@ -295,7 +297,18 @@ namespace MonoMenu.Engine.LogicalTree
                 events = value;
             }
         }
-        public List<Effects.BasicEffect> Effects
+        public Dictionary<string, BaseAnimation> Animations
+        {
+            get
+            {
+                return animations;
+            }
+            set
+            {
+                animations = value;
+            }
+        }
+        public Dictionary<string, Effects.BasicEffect> Effects
         {
             get
             {
@@ -550,8 +563,8 @@ namespace MonoMenu.Engine.LogicalTree
             Children = new List<LogicalNode>();
             this.menu = menu;
             this.name = name;
-            Events = new List<MenuEvent>();
-            animations = new List<BaseAnimation>();
+            Events = new Dictionary<string, MenuEvent>();
+            animations = new Dictionary<string, BaseAnimation>();
             animationsToRemove = new List<BaseAnimation>();
             eventsToTrigger = new List<MenuEvent>();
             this.VisualNode = new VisualNode(device, this);
@@ -622,7 +635,7 @@ namespace MonoMenu.Engine.LogicalTree
                             mRReleased = true;
                         }
 
-                        foreach (MenuEvent ev in events)
+                        foreach (MenuEvent ev in events.Values)
                         {
                             if (ev.EventType == MenuEvent.Type.MouseEnter && mEnter)
                             {
@@ -661,7 +674,7 @@ namespace MonoMenu.Engine.LogicalTree
                         {
                             mouseOver = false;
                             MouseLeave?.Invoke(this, null);
-                            foreach (MenuEvent ev in events)
+                            foreach (MenuEvent ev in events.Values)
                             {
                                 if (ev.EventType == MenuEvent.Type.MouseLeave)
                                 {
@@ -712,7 +725,7 @@ namespace MonoMenu.Engine.LogicalTree
                         mRReleased = true;
                     }
 
-                    foreach (MenuEvent ev in events)
+                    foreach (MenuEvent ev in events.Values)
                     {
                         if (ev.EventType == MenuEvent.Type.MouseEnter && mEnter)
                         {
@@ -752,7 +765,7 @@ namespace MonoMenu.Engine.LogicalTree
                 {
                     mouseOver = false;
                     MouseLeave?.Invoke(this, null);
-                    foreach (MenuEvent ev in events)
+                    foreach (MenuEvent ev in events.Values)
                     {
                         if (ev.EventType == MenuEvent.Type.MouseLeave)
                         {
@@ -795,7 +808,7 @@ namespace MonoMenu.Engine.LogicalTree
                     if (ret == false)
                     {
                         Click?.Invoke(this, null);
-                        foreach (MenuEvent ev in events)
+                        foreach (MenuEvent ev in events.Values)
                         {
                             if (ev.EventType == MenuEvent.Type.Click)
                             {
@@ -812,7 +825,7 @@ namespace MonoMenu.Engine.LogicalTree
                 else
                 {
                     Click?.Invoke(this, null);
-                    foreach (MenuEvent ev in events)
+                    foreach (MenuEvent ev in events.Values)
                     {
                         if (ev.EventType == MenuEvent.Type.Click)
                         {
@@ -855,7 +868,7 @@ namespace MonoMenu.Engine.LogicalTree
                     if (ret == false)
                     {
                         DoubleClick?.Invoke(this, null);
-                        foreach (MenuEvent ev in events)
+                        foreach (MenuEvent ev in events.Values)
                         {
                             if (ev.EventType == MenuEvent.Type.DoubleClick)
                             {
@@ -872,7 +885,7 @@ namespace MonoMenu.Engine.LogicalTree
                 else
                 {
                     DoubleClick?.Invoke(this, null);
-                    foreach (MenuEvent ev in events)
+                    foreach (MenuEvent ev in events.Values)
                     {
                         if (ev.EventType == MenuEvent.Type.DoubleClick)
                         {
@@ -932,7 +945,7 @@ namespace MonoMenu.Engine.LogicalTree
                 ev.Trigger(this);
             }
             eventsToTrigger.Clear();
-            foreach(BaseAnimation anim in animations)
+            foreach(BaseAnimation anim in animations.Values)
             {
                 if (anim.Enabled)
                 {
@@ -954,7 +967,7 @@ namespace MonoMenu.Engine.LogicalTree
             }
             foreach(BaseAnimation anim in animationsToRemove)
             {
-                animations.Remove(anim);
+                animations.Remove(anim.Name);
             }
             animationsToRemove.Clear();
         }
@@ -977,7 +990,7 @@ namespace MonoMenu.Engine.LogicalTree
 
         public BaseAnimation FindRunningAnimation(string name)
         {
-            foreach(BaseAnimation animation in animations)
+            foreach(BaseAnimation animation in animations.Values)
             {
                 if(animation.Name == name)
                 {
@@ -994,7 +1007,7 @@ namespace MonoMenu.Engine.LogicalTree
 
         public void AddAnimation(BaseAnimation animation)
         {
-            animations.Add(animation);
+            animations[animation.Name] = animation;
             animation.Finished += AnimationFinished;
         }
 
@@ -1019,7 +1032,7 @@ namespace MonoMenu.Engine.LogicalTree
         protected void AnimationFinished(Object sender, EventArgs e)
         {
             BaseAnimation finishedAnim = sender as BaseAnimation;
-            foreach(MenuEvent ev in events)
+            foreach(MenuEvent ev in events.Values)
             {
                 if(ev.EventType == MenuEvent.Type.AnimationFinished)
                 {
