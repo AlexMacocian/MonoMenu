@@ -130,6 +130,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="app.manifest" />
+    <None Include="Engine\Effects\Blur.mgfxo" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Engine\Effects\Blur.fx" />

@@ -52,22 +52,23 @@ namespace MonoMenu.Engine.Effects
 
         private void ApplyGPUEffect(RenderTarget2D renderTarget, SpriteBatch spriteBatch)
         {
-            float[] kernel = ComputeKernel(Radius, 3);
+            float[] kernel = ComputeKernel(0.3f*(radius / 2 - 1) + 0.8f, radius);
             ComputeOffsets(renderTarget.Width, renderTarget.Height);
+            effect.Parameters["kernel_size"].SetValue((float)radius * 2 + 1);
 
             effect.CurrentTechnique = effect.Techniques["GaussianBlur"];
             effect.Parameters["weights"].SetValue(kernel);
             effect.Parameters["colorMapTexture"].SetValue(renderTarget);
             effect.Parameters["offsets"].SetValue(offsetsHoriz);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, effect, null);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, effect, null);
             spriteBatch.Draw(renderTarget, new Rectangle(0, 0, renderTarget.Width, renderTarget.Height), Color.White);
             spriteBatch.End();
 
             effect.Parameters["colorMapTexture"].SetValue(renderTarget);
             effect.Parameters["offsets"].SetValue(offsetsVert);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, effect, null);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, null, null, null, effect, null);
             spriteBatch.Draw(renderTarget, new Rectangle(0, 0, renderTarget.Width, renderTarget.Height), Color.White);
             spriteBatch.End();
         }
@@ -259,7 +260,7 @@ namespace MonoMenu.Engine.Effects
             }
         }
 
-        private float[] ComputeKernel(int sigma, int n)
+        private float[] ComputeKernel(float sigma, int n)
         {
             float[] kernel = new float[n * 2 + 1];
             float total = 0.0f;

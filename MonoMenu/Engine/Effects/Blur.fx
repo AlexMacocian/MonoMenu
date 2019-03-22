@@ -1,12 +1,10 @@
-﻿#define RADIUS 7
-#define KERNEL_SIZE (RADIUS * 2 + 1)
-
-//-----------------------------------------------------------------------------
+﻿//-----------------------------------------------------------------------------
 // Globals.
 //-----------------------------------------------------------------------------
 
-float weights[KERNEL_SIZE];
-float2 offsets[KERNEL_SIZE];
+float kernel_size = 81;
+float weights[81];
+float2 offsets[81];
 
 //-----------------------------------------------------------------------------
 // Textures.
@@ -30,7 +28,7 @@ float4 PS_GaussianBlur(float2 texCoord : TEXCOORD) : COLOR0
 {
 	float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	for (int i = 0; i < KERNEL_SIZE; ++i)
+	[unroll(81)]for (int i = 0; i < kernel_size; ++i)
 		color += tex2D(colorMap, texCoord + offsets[i]) * weights[i];
 
 	return color;
@@ -44,6 +42,6 @@ technique GaussianBlur
 {
 	pass
 	{
-		PixelShader = compile ps_2_0 PS_GaussianBlur();
+		PixelShader = compile ps_3_0 PS_GaussianBlur();
 	}
 }
