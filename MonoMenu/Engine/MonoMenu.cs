@@ -122,8 +122,7 @@ namespace MonoMenu.Engine
         {
             root.VisualNode.RecursiveDraw(spriteBatch);
             graphicsDevice.SetRenderTarget(renderTarget);
-            graphicsDevice.Clear(Color.Transparent);
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Texture, BlendState.Additive);
             spriteBatch.Draw(root.VisualNode.RenderTarget, new Rectangle(root.AbsolutePosition.X, root.AbsolutePosition.Y, (int)root.DesiredWidth, (int)root.DesiredHeight), Color.White);
             spriteBatch.End();
         }

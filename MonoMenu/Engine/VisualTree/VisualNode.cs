@@ -255,11 +255,11 @@ namespace MonoMenu.Engine.VisualTree
 
             set
             {
-                visibility = value;
-                if (visibility == Visibility.Visible)
+                if (visibility != value)
                 {
                     Modified = true;
                 }
+                visibility = value;
             }
         }
 
