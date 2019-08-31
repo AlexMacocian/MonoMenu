@@ -66,10 +66,10 @@ namespace MonoMenuTest
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            MonoMenu.Engine.MonoMenu.defaultFont = Content.Load<SpriteFont>("font");
+            MonoMenu.Engine.MonoMenu.defaultFont = Content.Load<SpriteFont>("Arial");
             pixelText = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixelText.SetData(new[] { Color.White });
-            font = Content.Load<SpriteFont>("font");
+            font = Content.Load<SpriteFont>("Arial");
             xMenu = new MonoMenu.Engine.MonoMenu(GraphicsDevice, Content);
             xMenu.Load("text.xaml");
             // TODO: use this.Content to load your game content here

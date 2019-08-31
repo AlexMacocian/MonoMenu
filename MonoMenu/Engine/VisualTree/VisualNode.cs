@@ -425,7 +425,7 @@ namespace MonoMenu.Engine.VisualTree
                 for (int i = 0; i < lines.Count; i++)
                 {
                     string line = lines[i];
-                    Vector2 size = MonoMenu.defaultFont.MeasureString(line);
+                    Vector2 size = font.MeasureString(line);
                     size = new Vector2(size.X * scale, size.Y * scale);
                     Vector2 pos = new Vector2();
                     if (horizontalTextAlignment == HorizontalAlignment.Right)
