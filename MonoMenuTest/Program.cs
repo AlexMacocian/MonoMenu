@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MonoMenu
+namespace MonoMenuTest
 {
     /// <summary>
     /// The main class.

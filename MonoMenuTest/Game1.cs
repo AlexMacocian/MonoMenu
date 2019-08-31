@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace MonoMenu
+namespace MonoMenuTest
 {
     /// <summary>
     /// This is the main type for your game.
@@ -12,10 +12,10 @@ namespace MonoMenu
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Engine.MonoMenu xMenu;
+        MonoMenu.Engine.MonoMenu xMenu;
         SpriteFont font;
         Texture2D pixelText;
-        
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -42,7 +42,7 @@ namespace MonoMenu
 
         private void Window_TextInput(object sender, TextInputEventArgs e)
         {
-            if(xMenu != null)
+            if (xMenu != null)
             {
                 xMenu.OnTextInput(e);
             }
@@ -66,11 +66,11 @@ namespace MonoMenu
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            Engine.MonoMenu.defaultFont = Content.Load<SpriteFont>("font");
+            MonoMenu.Engine.MonoMenu.defaultFont = Content.Load<SpriteFont>("font");
             pixelText = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixelText.SetData(new[] { Color.White });
             font = Content.Load<SpriteFont>("font");
-            xMenu = new Engine.MonoMenu(GraphicsDevice, Content);
+            xMenu = new MonoMenu.Engine.MonoMenu(GraphicsDevice, Content);
             xMenu.Load("text.xaml");
             // TODO: use this.Content to load your game content here
         }

@@ -22,7 +22,7 @@ namespace MonoMenu.Engine
             {
                 if (Seconds > 0)
                 {
-                    return frames / Seconds;
+                    return frames / stopWatch.ElapsedMilliseconds * 1000;
                 }
                 else
                 {
@@ -40,7 +40,7 @@ namespace MonoMenu.Engine
             {
                 if (Seconds > 0)
                 {
-                    return updates / Seconds;
+                    return updates / stopWatch.ElapsedMilliseconds * 1000;
                 }
                 else
                 {
@@ -111,11 +111,6 @@ namespace MonoMenu.Engine
         {
             stopWatch = new Stopwatch();
             stopWatch.Start();
-        }
-
-        private static void Timer_CallBack(Object stateinfo)
-        {
-            millis += 100;
         }
     }
 }
